@@ -41,7 +41,7 @@
       position: relative;
       min-height: 100vh;
     }
-    /* Canvas для звездного поля */
+    /* Canvas для звёздного поля */
     #starsCanvas {
       position: fixed;
       top: 0;
@@ -72,7 +72,7 @@
       height: auto;
     }
 
-    /* Кнопка экспорта данных */
+    /* Кнопка копирования JSON */
     .export-btn {
       display: inline-block;
       margin-bottom: 20px;
@@ -473,8 +473,8 @@
   <!-- Изображение сайта (файл 202654381.png) -->
   <img src="202654381.png" alt="Изображение сайта" class="site-image" />
 
-  <!-- Кнопка экспорта данных -->
-  <button class="export-btn" onclick="exportDataAsJSON()">Экспорт JSON</button>
+  <!-- Кнопка копирования JSON -->
+  <button class="export-btn" onclick="copyDataAsJSON()">Копировать JSON</button>
 
   <!-- Кнопка "Прокачка" в правом верхнем углу -->
   <button class="upgrade-btn" onclick="location.href='page2.html'">Прокачка</button>
@@ -664,15 +664,12 @@
     function generateId() {
       return '_' + Math.random().toString(36).substr(2, 9);
     }
-    function exportDataAsJSON() {
-      const dataStr = JSON.stringify(data, null, 2);
-      const blob = new Blob([dataStr], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "levelUpData.json";
-      link.click();
-      URL.revokeObjectURL(url);
+    // Функция копирования JSON в буфер обмена
+    function copyDataAsJSON() {
+      const jsonStr = JSON.stringify(data, null, 2);
+      navigator.clipboard.writeText(jsonStr)
+        .then(() => showNotification("JSON скопирован в буфер обмена!"))
+        .catch((err) => console.error("Ошибка копирования JSON:", err));
     }
 
     /* =================== Часть 2: Рендер и редактирование навыков =================== */
@@ -750,7 +747,7 @@
 
     function openSkillModal() {
       const skill = data.skills[currentSkillIndex];
-      // Если навык дефолтный, переходим на page2.html
+      // Если дефолтный навык, переходим на page2.html
       if (skill.default) {
         location.href = 'page2.html';
         return;
