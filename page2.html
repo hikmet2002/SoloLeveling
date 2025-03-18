@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Страница прокачки</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #222;
+      color: #f00;
+      font-family: sans-serif;
+    }
+    .header {
+      position: relative;
+      text-align: center; 
+      padding: 20px;
+      font-size: 24px;
+      background: #000;
+      box-shadow: 0 2px 5px rgba(255,0,0,0.5);
+    }
+    /* Знак + в левом верхнем углу */
+    .plus-sign {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      font-size: 30px;
+      font-weight: bold;
+      color: #f0f;
+      cursor: pointer;
+    }
+    .container {
+      margin: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 30px;
+    }
+    /* Пример кружков и стрелок */
+    .circle-container {
+      position: relative;
+      width: 300px; 
+      height: 300px;
+      margin: auto;
+    }
+    .circle {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 2px solid;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      cursor: pointer;
+    }
+    /* Пример расстановки кружков */
+    .circle-main {
+      top: 120px; 
+      left: 120px;
+      border-color: red;
+    }
+    .circle-second {
+      top: 30px; 
+      left: 10px;
+      border-color: purple;
+    }
+    .circle-third {
+      top: 180px; 
+      left: 220px;
+      border-color: purple;
+    }
+    /* Пример стрелок (линий) - псевдоэлементы или отдельные div */
+    .line {
+      position: absolute;
+      width: 2px;
+      background: red;
+      transform-origin: top left;
+    }
+    /* Пример стрелки от main к second */
+    .line1 {
+      top: 120px; left: 120px;
+      height: 90px; 
+      transform: rotate(-45deg);
+    }
+    /* Пример стрелки от main к third */
+    .line2 {
+      top: 120px; left: 190px;
+      height: 70px;
+      transform: rotate(45deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="plus-sign">+</div>
+    Страница прокачки
+  </div>
+
+  <div class="container">
+    <div class="circle-container">
+      <!-- Линии -->
+      <div class="line line1"></div>
+      <div class="line line2"></div>
+
+      <!-- Кружки -->
+      <div class="circle circle-main" onclick="location.href='page3.html'">
+        <div>123<br>speed x1</div>
+      </div>
+      <div class="circle circle-second" onclick="location.href='page3.html'">
+        <div>words<br>x2</div>
+      </div>
+      <div class="circle circle-third" onclick="location.href='page3.html'">
+        <div>x2<br>+3 points</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
