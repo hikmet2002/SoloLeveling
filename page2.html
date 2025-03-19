@@ -1,356 +1,287 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Страница прокачки</title>
+  <meta charset="UTF-8" />
+  <title>Таймер и ввод номера</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       background: #111;
-      color: #ff4444;
-      font-family: 'Arial', sans-serif;
-      overflow: hidden;
-      min-height: 100vh;
+      color: #fff;
+      font-family: sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     .header {
       position: relative;
-      text-align: center;
+      text-align: center; 
       padding: 20px;
       font-size: 24px;
-      background: linear-gradient(135deg, #333, #555);
-      box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
-      border-bottom: 2px solid #ff3333;
+      background: #000;
+      box-shadow: 0 2px 5px rgba(255,0,0,0.5);
+      user-select: none;
     }
-
     .plus-sign {
       position: absolute;
       left: 20px;
-      top: 15px;
-      font-size: 36px;
-      color: #ff66ff;
+      top: 20px;
+      font-size: 30px;
+      font-weight: bold;
+      color: #f0f;
       cursor: pointer;
-      transition: transform 0.3s;
     }
 
-    .plus-sign:hover {
-      transform: rotate(90deg) scale(1.2);
-    }
-
+    /* Контейнер с кружками (как в предыдущих примерах) */
     .container {
-      position: relative;
-      height: calc(100vh - 100px);
+      margin: 40px;
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
+      gap: 30px;
     }
-
     .circle-container {
       position: relative;
-      width: 400px;
-      height: 400px;
-      transform-style: preserve-3d;
-      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      width: 300px;
+      height: 300px;
+      margin: auto;
     }
-
     .circle {
       position: absolute;
-      width: 100px;
-      height: 100px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #444, #222);
-      border: 3px solid #ff3333;
+      border: 2px solid;
       display: flex;
       justify-content: center;
       align-items: center;
       color: #fff;
       cursor: pointer;
-      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-      transition: all 0.3s;
-      transform: scale(0.9);
-      opacity: 0.8;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
-    .circle.active {
-      transform: scale(1);
-      opacity: 1;
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+    .circle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
     }
-
-    .circle.locked {
-      cursor: not-allowed;
-      opacity: 0.3;
-      border-color: #666;
-    }
-
-    .circle:hover:not(.locked) {
-      transform: scale(1.05);
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.7);
-    }
-
+    /* Позиции кружков */
     .circle-main {
-      top: 150px;
-      left: 150px;
-      background: linear-gradient(135deg, #ff4444, #cc0000);
+      top: 120px; 
+      left: 120px;
+      border-color: red;
     }
-
     .circle-second {
-      top: 50px;
-      left: 50px;
-      background: linear-gradient(135deg, #9933ff, #6600cc);
+      top: 30px; 
+      left: 10px;
+      border-color: purple;
     }
-
     .circle-third {
-      top: 250px;
-      left: 250px;
-      background: linear-gradient(135deg, #33ccff, #0099cc);
+      top: 180px; 
+      left: 220px;
+      border-color: purple;
     }
 
-    .arrow {
+    /* Стрелки */
+    .line {
       position: absolute;
-      height: 2px;
-      background: linear-gradient(90deg, #ff3333, #ff9933);
-      transition: all 0.3s;
+      width: 2px;
+      background: red;
+      transform-origin: top left;
     }
-
-    .arrow::before {
-      content: '';
-      position: absolute;
-      top: -4px;
-      right: 0;
-      border: 6px solid transparent;
-      border-left-color: #ff6600;
-    }
-
-    .arrow1 {
-      width: 140px;
+    .line1 {
+      top: 120px; left: 120px;
+      height: 90px;
       transform: rotate(-45deg);
-      transform-origin: top left;
-      top: 170px;
-      left: 170px;
     }
-
-    .arrow2 {
-      width: 140px;
+    .line2 {
+      top: 120px; left: 190px;
+      height: 70px;
       transform: rotate(45deg);
-      transform-origin: top left;
-      top: 170px;
-      left: 170px;
     }
 
-    /* Модальное окно */
-    .modal {
-      display: none;
+    /* ========= Стили модального окна ========= */
+    .modal-overlay {
+      display: none; /* скрыто по умолчанию */
       position: fixed;
-      top: 0;
+      top: 0; 
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
+      background: rgba(0,0,0,0.7);
+      z-index: 999; /* поверх всего */
+      justify-content: center;
+      align-items: center;
     }
-
-    .modal-content {
-      background: #222;
-      border: 2px solid #ff3333;
-      border-radius: 10px;
+    .modal {
+      background: #1a1a1a;
+      border: 2px solid #f00;
       width: 300px;
       padding: 20px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       text-align: center;
+      position: relative;
+      box-shadow: 0 0 10px #f00;
     }
-
-    .close {
-      float: right;
-      cursor: pointer;
+    .modal-header {
+      font-size: 20px;
+      color: #f00;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #f00;
+      padding-bottom: 5px;
+    }
+    .timer {
       font-size: 24px;
-      color: #ff6666;
-    }
-
-    #timer {
-      font-size: 36px;
-      color: #ffcc00;
-      margin: 20px 0;
-    }
-
-    #numberInput {
-      width: 100%;
-      padding: 10px;
-      background: #333;
-      border: 1px solid #ff3333;
-      color: #fff;
+      color: #f00;
       margin: 10px 0;
     }
-
-    button {
-      background: linear-gradient(135deg, #ff4444, #cc0000);
+    .random-number {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 10px auto;
+      background: purple;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      color: #fff;
+      border-radius: 8px;
+    }
+    .speed {
+      color: #f00;
+      margin-bottom: 10px;
+    }
+    .input-container {
+      margin-bottom: 10px;
+    }
+    .input-container input {
+      width: 80%;
+      padding: 5px;
+      text-align: center;
+      font-size: 16px;
+    }
+    #confirmButton {
+      background: #f00;
+      color: #fff;
       border: none;
       padding: 10px 20px;
-      color: white;
       cursor: pointer;
-      border-radius: 5px;
+      font-size: 16px;
+      border-radius: 4px;
     }
-
-    #feedback {
-      margin-top: 15px;
-      font-size: 18px;
+    #confirmButton:hover {
+      background: #ff5050;
     }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    .circle-main {
-      animation: pulse 2s infinite;
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #f00;
+      font-weight: bold;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="plus-sign" onclick="alert('Меню улучшений')">+</div>
+    <div class="plus-sign">+</div>
     Страница прокачки
   </div>
 
-  <div class="container" id="container">
-    <div class="circle-container" id="circleContainer">
-      <!-- Стрелки -->
-      <div class="arrow arrow1"></div>
-      <div class="arrow arrow2"></div>
+  <div class="container">
+    <div class="circle-container">
+      <!-- Линии -->
+      <div class="line line1"></div>
+      <div class="line line2"></div>
 
-      <!-- Кружки -->
-      <div class="circle circle-main active" onclick="showModal(this)">
-        <div data-number="123">123<br>speed x1</div>
+      <!-- Кружки. При клике - открываем модал -->
+      <div class="circle circle-main" onclick="openModal()">
+        <div>123<br>speed x1</div>
       </div>
-      <div class="circle circle-second locked" onclick="showModal(this)">
-        <div data-number="456">words<br>x2</div>
+      <div class="circle circle-second" onclick="openModal()">
+        <div>words<br>x2</div>
       </div>
-      <div class="circle circle-third locked" onclick="showModal(this)">
-        <div data-number="789">x2<br>+3 points</div>
+      <div class="circle circle-third" onclick="openModal()">
+        <div>x2<br>+3 points</div>
       </div>
     </div>
   </div>
 
   <!-- Модальное окно -->
-  <div id="memorizeModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h3>Запомните число:</h3>
-      <div id="numberDisplay">123</div>
-      <div id="timer">10</div>
-      <input type="number" id="numberInput" placeholder="Введите число">
-      <button onclick="checkAnswer()">Проверить</button>
-      <div id="feedback"></div>
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="close-button" onclick="closeModal()">X</div>
+      <div class="modal-header">Таймер и ввод номера</div>
+      <div class="timer" id="timer">00:05 sec.</div>
+      <div class="random-number" id="randomNumber">8532</div>
+      <div class="speed">speed x1</div>
+
+      <div class="input-container">
+        <input type="text" id="userInput" placeholder="Введите номер" />
+      </div>
+
+      <button id="confirmButton">OK</button>
     </div>
   </div>
 
   <script>
-    let currentNumber = null;
-    let timerInterval = null;
-    let timeLeft = 10;
+    // Для таймера и генерации случайного числа
+    let countdown;
+    let timeLeft;
+    let randomNum;
 
-    // Функция открытия модального окна
-    function showModal(element) {
-      if (element.classList.contains('locked')) {
-        alert('Сначала активируйте главный круг!');
+    function openModal() {
+      // Показываем оверлей
+      document.getElementById('modalOverlay').style.display = 'flex';
+
+      // Генерируем случайный 4-значный номер
+      randomNum = Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('randomNumber').textContent = randomNum;
+
+      // Ставим время отсчёта
+      timeLeft = 5;
+      updateTimerDisplay(timeLeft);
+
+      // Запускаем отсчёт
+      clearInterval(countdown);
+      countdown = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          document.getElementById('timer').textContent = 'Время вышло!';
+          // Здесь можно отключить ввод или выполнить другую логику
+        } else {
+          updateTimerDisplay(timeLeft);
+        }
+      }, 1000);
+    }
+
+    function closeModal() {
+      // Прячем оверлей
+      document.getElementById('modalOverlay').style.display = 'none';
+      clearInterval(countdown);
+    }
+
+    function updateTimerDisplay(seconds) {
+      // Формируем строку "00:05 sec."
+      let secStr = seconds < 10 ? '0' + seconds : seconds;
+      document.getElementById('timer').textContent = `00:${secStr} sec.`;
+    }
+
+    // Обработка нажатия OK
+    document.getElementById('confirmButton').addEventListener('click', function() {
+      const userValue = document.getElementById('userInput').value;
+      if (!userValue) {
+        alert('Введите номер!');
         return;
       }
-      
-      const numberElement = element.querySelector('div');
-      currentNumber = numberElement.getAttribute('data-number');
-      
-      const modal = document.getElementById('memorizeModal');
-      const numberDisplay = document.getElementById('numberDisplay');
-      
-      numberDisplay.textContent = currentNumber;
-      timeLeft = 10;
-      document.getElementById('timer').textContent = timeLeft;
-      document.getElementById('numberInput').value = '';
-      document.getElementById('feedback').textContent = '';
-      
-      modal.style.display = 'block';
-      
-      // Запуск таймера
-      clearInterval(timerInterval);
-      timerInterval = setInterval(updateTimer, 1000);
-    }
-
-    // Функция закрытия модального окна
-    function closeModal() {
-      clearInterval(timerInterval);
-      document.getElementById('memorizeModal').style.display = 'none';
-    }
-
-    // Обновление таймера
-    function updateTimer() {
-      timeLeft--;
-      document.getElementById('timer').textContent = timeLeft;
-      
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        checkAnswer(true);
-      }
-    }
-
-    // Проверка ответа
-    function checkAnswer(timeout = false) {
-      const userAnswer = document.getElementById('numberInput').value;
-      const feedback = document.getElementById('feedback');
-      
-      if (userAnswer == currentNumber) {
-        feedback.textContent = 'Правильно!';
-        feedback.style.color = '#00ff00';
-        setTimeout(closeModal, 1000);
-        
-        // Здесь можно добавить логику успешного выполнения
-        if (!timeout) alert('Число запомнено верно!');
-        
+      // Можно, например, проверить совпадение с randomNum
+      if (parseInt(userValue) === randomNum) {
+        alert('Вы ввели правильный номер!');
       } else {
-        feedback.textContent = 'Неправильно!';
-        feedback.style.color = '#ff0000';
-        if (!timeout) alert('Попробуйте еще раз!');
+        alert('Номер не совпадает!');
       }
-    }
-
-    // Драг-н-дроп для контейнера
-    let isDragging = false;
-    let startX, startY;
-    let rotateX = 0, rotateY = 0;
-
-    const circleContainer = document.getElementById('circleContainer');
-
-    circleContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      rotateX += (e.clientY - startY) * 0.3;
-      rotateY += (e.clientX - startX) * 0.3;
-      circleContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      startX = e.clientX;
-      startY = e.clientY;
-    });
-
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-
-    // Активация главного круга
-    document.querySelector('.circle-main').addEventListener('click', () => {
-      if (!document.querySelector('.circle-main').classList.contains('active')) return;
-      
-      // После активации разблокируем другие круги
-      document.querySelectorAll('.locked').forEach(circle => {
-        circle.classList.remove('locked');
-        circle.classList.add('active');
-      });
+      // Закрываем модальное окно
+      closeModal();
     });
   </script>
 </body>
