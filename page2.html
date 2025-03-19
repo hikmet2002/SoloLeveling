@@ -1,19 +1,54 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Страница прокачки</title>
   <style>
-    body {
+    /* =================== Стили и анимации =================== */
+    * {
       margin: 0;
       padding: 0;
-      background: #222;
-      color: #f00;
-      font-family: sans-serif;
+      box-sizing: border-box;
     }
+    @keyframes moveBackground {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes neonFlicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.95; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(270deg, #222, #111, #222);
+      background-size: 400% 400%;
+      animation: moveBackground 20s linear infinite;
+      color: #f00;
+      overflow: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+    /* Canvas для звездного поля */
+    #starsCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -100;
+      pointer-events: none;
+    }
+    
     .header {
       position: relative;
-      text-align: center; 
+      text-align: center;
       padding: 20px;
       font-size: 24px;
       background: #000;
@@ -29,21 +64,57 @@
       color: #f0f;
       cursor: pointer;
     }
-    .container {
-      margin: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      gap: 30px;
+    
+    /* Кнопки навигации */
+    .nav-buttons {
+      text-align: center;
+      margin-top: 20px;
     }
-    /* Пример кружков и стрелок */
-    .circle-container {
+    .nav-buttons button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background: #00ccff;
+      color: #000;
+      box-shadow: 0 0 10px rgba(0,204,255,0.5);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .nav-buttons button:disabled {
+      background: #555;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .nav-buttons button:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0,204,255,0.7);
+    }
+    
+    /* Драггируемый контейнер */
+    .draggable-wrapper {
+      overflow: hidden;
+      width: 100%;
+      height: 400px;
       position: relative;
-      width: 300px; 
-      height: 300px;
-      margin: auto;
+      cursor: grab;
     }
+    .draggable-wrapper:active {
+      cursor: grabbing;
+    }
+    
+    .circle-container {
+      position: absolute;
+      width: 600px; /* Больше, чем видимая область */
+      height: 600px;
+      /* Центрируем начальное положение */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    /* Кружки */
     .circle {
       position: absolute;
       width: 70px;
@@ -51,71 +122,580 @@
       border-radius: 50%;
       border: 2px solid;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       color: #fff;
+      font-size: 14px;
       cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    /* Пример расстановки кружков */
+    .circle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(255,255,255,0.7);
+    }
+    /* Пример расположения кружков */
     .circle-main {
-      top: 120px; 
-      left: 120px;
+      top: 240px;
+      left: 240px;
       border-color: red;
     }
     .circle-second {
-      top: 30px; 
-      left: 10px;
+      top: 50px;
+      left: 50px;
       border-color: purple;
     }
     .circle-third {
-      top: 180px; 
-      left: 220px;
+      top: 450px;
+      left: 450px;
       border-color: purple;
     }
-    /* Пример стрелок (линий) - псевдоэлементы или отдельные div */
+    
+    /* Стрелки (линии), указывающие на кружки */
     .line {
       position: absolute;
       width: 2px;
       background: red;
       transform-origin: top left;
+      opacity: 0.8;
     }
     /* Пример стрелки от main к second */
     .line1 {
-      top: 120px; left: 120px;
-      height: 90px; 
+      top: 240px;
+      left: 240px;
+      height: 150px;
       transform: rotate(-45deg);
     }
     /* Пример стрелки от main к third */
     .line2 {
-      top: 120px; left: 190px;
-      height: 70px;
+      top: 240px;
+      left: 310px;
+      height: 150px;
       transform: rotate(45deg);
     }
+    
+    /* =================== Конец интерфейсной части =================== */
   </style>
 </head>
 <body>
+  <canvas id="starsCanvas"></canvas>
   <div class="header">
-    <div class="plus-sign">+</div>
+    <div class="plus-sign" onclick="location.href='page2.html'">+</div>
     Страница прокачки
   </div>
-
-  <div class="container">
-    <div class="circle-container">
-      <!-- Линии -->
+  
+  <!-- Драггируемый контейнер с кружками и стрелками -->
+  <div class="draggable-wrapper" id="draggableWrapper">
+    <div class="circle-container" id="circleContainer">
+      <!-- Стрелки (линии) -->
       <div class="line line1"></div>
       <div class="line line2"></div>
-
+      
       <!-- Кружки -->
-      <div class="circle circle-main" onclick="location.href='page3.html'">
+      <div class="circle circle-main" onclick="circleClicked('main')">
         <div>123<br>speed x1</div>
       </div>
-      <div class="circle circle-second" onclick="location.href='page3.html'">
+      <div class="circle circle-second" onclick="circleClicked('second')">
         <div>words<br>x2</div>
       </div>
-      <div class="circle circle-third" onclick="location.href='page3.html'">
-        <div>x2<br>+3 points</div>
+      <div class="circle circle-third" onclick="circleClicked('third')">
+        <div>x2<br>+3 pts</div>
       </div>
     </div>
   </div>
+  
+  <!-- Кнопки навигации -->
+  <div class="nav-buttons">
+    <button onclick="prevCircle()">Назад</button>
+    <button id="nextBtn" onclick="nextCircle()" disabled>Далее</button>
+  </div>
+  
+  <script>
+    /* ========== Звёздное поле ========== */
+    const canvas = document.getElementById("starsCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const stars = [];
+    const numStars = 300;
+    for (let i = 0; i < numStars; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.5,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3
+      });
+    }
+    const galaxies = [];
+    const numGalaxies = 5;
+    for (let i = 0; i < numGalaxies; i++) {
+      galaxies.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: 20 + Math.random() * 30,
+        vx: (Math.random() - 0.5) * 0.1,
+        vy: (Math.random() - 0.5) * 0.1
+      });
+    }
+    function animateStarfield() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let star of stars) {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        star.x += star.vx;
+        star.y += star.vy;
+        if (star.x < 0) star.x = canvas.width;
+        if (star.x > canvas.width) star.x = 0;
+        if (star.y < 0) star.y = canvas.height;
+        if (star.y > canvas.height) star.y = 0;
+      }
+      for (let galaxy of galaxies) {
+        let grad = ctx.createRadialGradient(
+          galaxy.x, galaxy.y, galaxy.radius * 0.1,
+          galaxy.x, galaxy.y, galaxy.radius
+        );
+        grad.addColorStop(0, "rgba(255,255,255,1)");
+        grad.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.beginPath();
+        ctx.arc(galaxy.x, galaxy.y, galaxy.radius, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        galaxy.x += galaxy.vx;
+        galaxy.y += galaxy.vy;
+        if (galaxy.x < 0) galaxy.x = canvas.width;
+        if (galaxy.x > canvas.width) galaxy.x = 0;
+        if (galaxy.y < 0) galaxy.y = canvas.height;
+        if (galaxy.y > canvas.height) galaxy.y = 0;
+      }
+      requestAnimationFrame(animateStarfield);
+    }
+    animateStarfield();
+
+    /* ========== Драггируемый контейнер ========== */
+    const wrapper = document.getElementById("draggableWrapper");
+    let isDragging = false;
+    let startX, startY, initialX, initialY;
+
+    wrapper.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      const transform = window.getComputedStyle(wrapper).transform;
+      if (transform !== "none") {
+        const matrix = new WebKitCSSMatrix(transform);
+        initialX = matrix.m41;
+        initialY = matrix.m42;
+      } else {
+        initialX = 0;
+        initialY = 0;
+      }
+    });
+    document.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      wrapper.style.transform = `translate(${initialX + dx}px, ${initialY + dy}px)`;
+    });
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+
+    /* ========== Логика работы с кружками и навигацией ========== */
+    // Флаг, указывающий, что текущий круг выполнен
+    let currentCircleCompleted = false;
+
+    // При клике на кружок, если выполнен, переходим на page3.html
+    function circleClicked(circleId) {
+      // Здесь можно добавить проверку/анимацию выполнения
+      currentCircleCompleted = true;
+      // Визуально выделяем выполненный круг (например, добавляем класс)
+      // Затем активируем кнопку "Далее"
+      document.getElementById("nextBtn").disabled = false;
+      // Переход на page3.html можно выполнить по окончании, либо при клике на кнопку "Далее"
+      // Для примера, здесь просто выводим уведомление:
+      alert("Круг выполнен! Теперь можно перейти к следующему.");
+    }
+
+    // Функции навигации между кружками
+    function prevCircle() {
+      // Перемещаем контейнер вправо (пример простого смещения)
+      const container = document.getElementById("circleContainer");
+      container.style.transform = "translate(-100px, -50px)";
+      // Можно добавить логику для переключения на предыдущий кружок
+    }
+    function nextCircle() {
+      if (!currentCircleCompleted) {
+        alert("Сначала выполните текущий круг!");
+        return;
+      }
+      // Перемещаем контейнер влево для показа следующего кружка
+      const container = document.getElementById("circleContainer");
+      container.style.transform = "translate(-300px, -50px)";
+      // После перехода сбрасываем флаг
+      currentCircleCompleted = false;
+      document.getElementById("nextBtn").disabled = true;
+      // Здесь можно также реализовать проверку и переход на page3.html при выборе кружка
+    }
+
+    /* ========== Пример улучшенного интерфейса кружков ========== */
+    // Здесь можно добавить дополнительные анимации и логику показа стрелок, если потребуется.
+
+    /* ========== Остальной функционал (навыки, задания, таймер, уведомления) ========== */
+    const STORAGE_KEY = "levelUpData";
+    let data = {
+      skills: [],
+      tasks: []
+    };
+
+    if (localStorage.getItem(STORAGE_KEY)) {
+      data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    } else {
+      data.skills.push({
+        id: generateId(),
+        name: "Default Skill",
+        level: 1,
+        exp: 0,
+        desc: "Это дефолтный навык. Нажмите для прокачки.",
+        default: true
+      });
+      saveData();
+    }
+
+    let currentSkillIndex = 0;
+    let currentTaskId = null;
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+    function generateId() {
+      return '_' + Math.random().toString(36).substr(2, 9);
+    }
+    function copyDataAsJSON() {
+      const jsonStr = JSON.stringify(data, null, 2);
+      navigator.clipboard.writeText(jsonStr)
+        .then(() => showNotification("JSON скопирован в буфер обмена!"))
+        .catch((err) => console.error("Ошибка копирования JSON:", err));
+    }
+
+    /* Рендер и редактирование навыков */
+    function renderSkill() {
+      if (data.skills.length === 0) {
+        data.skills.push({
+          id: generateId(),
+          name: "Default Skill",
+          level: 1,
+          exp: 0,
+          desc: "Это дефолтный навык. Нажмите для прокачки.",
+          default: true
+        });
+        currentSkillIndex = 0;
+        saveData();
+      }
+      const skill = data.skills[currentSkillIndex];
+      document.getElementById("skillNameDisplay").innerText = skill.name;
+      document.getElementById("skillLevelDisplay").innerText = skill.level;
+      const squares = document.querySelectorAll("#skillExpDisplay .exp-square");
+      squares.forEach((sq, index) => {
+        if (index < skill.exp) {
+          sq.classList.add("filled");
+        } else {
+          sq.classList.remove("filled");
+        }
+      });
+      const skillBlock = document.getElementById("skillBlock");
+      if (skill.default) {
+        skillBlock.classList.add("default-skill");
+      } else {
+        skillBlock.classList.remove("default-skill");
+      }
+    }
+    function skillSquareClick(e, index) {
+      e.stopPropagation();
+      const skill = data.skills[currentSkillIndex];
+      if (skill.exp > index) {
+        skill.exp = index;
+      } else {
+        skill.exp = index + 1;
+      }
+      saveData();
+      renderSkill();
+    }
+    function prevSkill() {
+      if (currentSkillIndex > 0) {
+        currentSkillIndex--;
+        renderSkill();
+      }
+    }
+    function nextSkill() {
+      if (currentSkillIndex < data.skills.length - 1) {
+        currentSkillIndex++;
+      } else {
+        addNewSkill();
+      }
+      renderSkill();
+    }
+    function addNewSkill() {
+      const newSkill = {
+        id: generateId(),
+        name: "Новый навык",
+        level: 1,
+        exp: 0,
+        desc: "",
+        default: false
+      };
+      data.skills.push(newSkill);
+      currentSkillIndex = data.skills.length - 1;
+      saveData();
+    }
+    function openSkillModal() {
+      const skill = data.skills[currentSkillIndex];
+      if (skill.default) {
+        location.href = 'page2.html';
+        return;
+      }
+      document.getElementById("skillModalOverlay").style.display = "flex";
+      document.getElementById("skillNameInput").value = skill.name;
+      document.getElementById("skillLevelInput").value = skill.level;
+      document.getElementById("skillExpInput").value = skill.exp;
+      document.getElementById("skillDescInput").value = skill.desc;
+    }
+    function closeSkillModal() {
+      document.getElementById("skillModalOverlay").style.display = "none";
+    }
+    function saveSkillModal() {
+      const skill = data.skills[currentSkillIndex];
+      skill.name = document.getElementById("skillNameInput").value || "Название навыка";
+      skill.level = parseInt(document.getElementById("skillLevelInput").value) || 1;
+      skill.exp = parseInt(document.getElementById("skillExpInput").value) || 0;
+      skill.desc = document.getElementById("skillDescInput").value;
+      skill.default = false;
+      saveData();
+      closeSkillModal();
+      renderSkill();
+      showNotification("Навык сохранён!");
+    }
+    function checkLevelUp() {
+      const skill = data.skills[currentSkillIndex];
+      if (skill.exp >= 5) {
+        skill.exp -= 5;
+        skill.level++;
+        showNotification(`Уровень повышен до ${skill.level}!`);
+      }
+    }
+
+    /* Рендер и редактирование заданий */
+    function renderTasks() {
+      const taskList = document.getElementById("taskList");
+      taskList.innerHTML = "";
+      data.tasks.forEach(task => {
+        const div = document.createElement("div");
+        div.className = "task-item";
+        div.dataset.id = task.id;
+
+        const infoBlock = document.createElement("div");
+        infoBlock.className = "task-info-block";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "task-name";
+        nameSpan.innerText = task.name;
+
+        const rewardSpan = document.createElement("span");
+        rewardSpan.className = "task-reward";
+        rewardSpan.innerText = task.reward ? `Награда: ${task.reward} XP` : "Награда: —";
+
+        const descSpan = document.createElement("span");
+        descSpan.className = "task-desc";
+        descSpan.innerText = task.desc ? `Описание: ${task.desc}` : "Описание: —";
+
+        infoBlock.appendChild(nameSpan);
+        infoBlock.appendChild(rewardSpan);
+        infoBlock.appendChild(descSpan);
+        div.appendChild(infoBlock);
+
+        const btnGroup = document.createElement("div");
+        btnGroup.className = "btn-group";
+
+        const completeBtn = document.createElement("button");
+        completeBtn.className = "complete-btn";
+        completeBtn.innerText = "выполнено";
+        completeBtn.onclick = () => completeTask(task.id);
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "edit-btn";
+        editBtn.innerText = "ред.";
+        editBtn.onclick = () => openTaskModal(task.id);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-btn";
+        deleteBtn.innerText = "удалить";
+        deleteBtn.onclick = () => {
+          data.tasks = data.tasks.filter(t => t.id !== task.id);
+          saveData();
+          renderTasks();
+          showNotification("Задание удалено!");
+        };
+
+        btnGroup.appendChild(completeBtn);
+        btnGroup.appendChild(editBtn);
+        btnGroup.appendChild(deleteBtn);
+        div.appendChild(btnGroup);
+
+        taskList.appendChild(div);
+      });
+    }
+    function addTask() {
+      const name = document.getElementById("newTaskInput").value.trim();
+      const reward = document.getElementById("newTaskRewardInput").value.trim();
+      const desc = document.getElementById("newTaskDescInput").value.trim();
+      if (!name) return;
+      const task = {
+        id: generateId(),
+        name,
+        reward,
+        desc
+      };
+      data.tasks.push(task);
+      document.getElementById("newTaskInput").value = "";
+      document.getElementById("newTaskRewardInput").value = "";
+      document.getElementById("newTaskDescInput").value = "";
+      saveData();
+      renderTasks();
+      showNotification("Задание добавлено!");
+    }
+    function completeTask(id) {
+      const task = data.tasks.find(t => t.id === id);
+      if (task && task.reward) {
+        const xpReward = parseInt(task.reward) || 0;
+        const skill = data.skills[currentSkillIndex];
+        skill.exp += xpReward;
+        checkLevelUp();
+        saveData();
+        renderSkill();
+      }
+      data.tasks = data.tasks.filter(t => t.id !== id);
+      saveData();
+      renderTasks();
+      showNotification("Задание выполнено и опыт получен!");
+    }
+    function openTaskModal(id) {
+      currentTaskId = id;
+      const task = data.tasks.find(t => t.id === id);
+      if (task) {
+        document.getElementById("taskNameInput").value = task.name;
+        document.getElementById("taskRewardInput").value = task.reward || "";
+        document.getElementById("taskDescInput").value = task.desc || "";
+        document.getElementById("taskModalOverlay").style.display = "flex";
+      }
+    }
+    function closeTaskModal() {
+      document.getElementById("taskModalOverlay").style.display = "none";
+      currentTaskId = null;
+    }
+    function saveTaskModal() {
+      const name = document.getElementById("taskNameInput").value.trim();
+      const reward = document.getElementById("taskRewardInput").value.trim();
+      const desc = document.getElementById("taskDescInput").value.trim();
+      if (currentTaskId) {
+        const task = data.tasks.find(t => t.id === currentTaskId);
+        if (task) {
+          task.name = name || "Без названия";
+          task.reward = reward;
+          task.desc = desc;
+        }
+      }
+      saveData();
+      closeTaskModal();
+      renderTasks();
+      showNotification("Задание обновлено!");
+    }
+
+    /* Таймер */
+    let timerInterval = null;
+    let remainingTime = { hours: 0, minutes: 0, seconds: 0 };
+
+    function startTimer() {
+      const hours = parseInt(document.getElementById("hoursInput").value) || 0;
+      const minutes = parseInt(document.getElementById("minutesInput").value) || 0;
+      const seconds = parseInt(document.getElementById("secondsInput").value) || 0;
+      if (hours === 0 && minutes === 0 && seconds === 0) {
+        alert("Укажите время для таймера!");
+        return;
+      }
+      remainingTime = { hours, minutes, seconds };
+      updateTimerDisplay();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+    function updateTimer() {
+      if (remainingTime.seconds > 0) {
+        remainingTime.seconds--;
+      } else {
+        if (remainingTime.minutes > 0) {
+          remainingTime.minutes--;
+          remainingTime.seconds = 59;
+        } else {
+          if (remainingTime.hours > 0) {
+            remainingTime.hours--;
+            remainingTime.minutes = 59;
+            remainingTime.seconds = 59;
+          } else {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            alert("Время истекло!");
+            resetTimer();
+            return;
+          }
+        }
+      }
+      updateTimerDisplay();
+    }
+    function updateTimerDisplay() {
+      document.getElementById("timerDisplay").innerText = formatTime(remainingTime);
+    }
+    function pauseTimer() {
+      if (timerInterval !== null) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+    function resetTimer() {
+      pauseTimer();
+      remainingTime = { hours: 0, minutes: 0, seconds: 0 };
+      updateTimerDisplay();
+      document.getElementById("hoursInput").value = 0;
+      document.getElementById("minutesInput").value = 0;
+      document.getElementById("secondsInput").value = 0;
+    }
+    function formatTime(time) {
+      const h = String(time.hours).padStart(2, '0');
+      const m = String(time.minutes).padStart(2, '0');
+      const s = String(time.seconds).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    /* Уведомления */
+    function showNotification(message) {
+      const notification = document.createElement("div");
+      notification.className = "notification";
+      notification.innerText = message;
+      document.body.appendChild(notification);
+      notification.style.display = "block";
+      setTimeout(() => {
+        notification.style.display = "none";
+        document.body.removeChild(notification);
+      }, 3000);
+    }
+
+    /* INITIAL RENDER */
+    renderSkill();
+    renderTasks();
+  </script>
 </body>
 </html>
