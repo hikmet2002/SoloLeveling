@@ -139,6 +139,66 @@
       left: 170px;
     }
 
+    /* Модальное окно */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background: #222;
+      border: 2px solid #ff3333;
+      border-radius: 10px;
+      width: 300px;
+      padding: 20px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .close {
+      float: right;
+      cursor: pointer;
+      font-size: 24px;
+      color: #ff6666;
+    }
+
+    #timer {
+      font-size: 36px;
+      color: #ffcc00;
+      margin: 20px 0;
+    }
+
+    #numberInput {
+      width: 100%;
+      padding: 10px;
+      background: #333;
+      border: 1px solid #ff3333;
+      color: #fff;
+      margin: 10px 0;
+    }
+
+    button {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #feedback {
+      margin-top: 15px;
+      font-size: 18px;
+    }
+
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.1); }
@@ -163,51 +223,106 @@
       <div class="arrow arrow2"></div>
 
       <!-- Кружки -->
-      <div class="circle circle-main active" onclick="activateCircle(this)">
-        <div>123<br>speed x1</div>
+      <div class="circle circle-main active" onclick="showModal(this)">
+        <div data-number="123">123<br>speed x1</div>
       </div>
-      <div class="circle circle-second locked" onclick="checkUnlock(this)">
-        <div>words<br>x2</div>
+      <div class="circle circle-second locked" onclick="showModal(this)">
+        <div data-number="456">words<br>x2</div>
       </div>
-      <div class="circle circle-third locked" onclick="checkUnlock(this)">
-        <div>x2<br>+3 points</div>
+      <div class="circle circle-third locked" onclick="showModal(this)">
+        <div data-number="789">x2<br>+3 points</div>
       </div>
     </div>
   </div>
 
+  <!-- Модальное окно -->
+  <div id="memorizeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>Запомните число:</h3>
+      <div id="numberDisplay">123</div>
+      <div id="timer">10</div>
+      <input type="number" id="numberInput" placeholder="Введите число">
+      <button onclick="checkAnswer()">Проверить</button>
+      <div id="feedback"></div>
+    </div>
+  </div>
+
   <script>
-    let isDragging = false;
-    let startX, startY;
-    let rotateX = 0, rotateY = 0;
+    let currentNumber = null;
+    let timerInterval = null;
+    let timeLeft = 10;
 
-    const container = document.getElementById('container');
-    const circleContainer = document.getElementById('circleContainer');
-
-    // Анимация разблокировки
-    function activateCircle(element) {
-      if (!element.classList.contains('active')) return;
-      
-      // Здесь можно добавить логику выполнения действия
-      alert('Главный круг активирован!');
-      
-      // После выполнения действия разблокируем другие круги
-      document.querySelectorAll('.locked').forEach(circle => {
-        circle.classList.remove('locked');
-        circle.classList.add('active');
-      });
-    }
-
-    function checkUnlock(element) {
+    // Функция открытия модального окна
+    function showModal(element) {
       if (element.classList.contains('locked')) {
         alert('Сначала активируйте главный круг!');
+        return;
+      }
+      
+      const numberElement = element.querySelector('div');
+      currentNumber = numberElement.getAttribute('data-number');
+      
+      const modal = document.getElementById('memorizeModal');
+      const numberDisplay = document.getElementById('numberDisplay');
+      
+      numberDisplay.textContent = currentNumber;
+      timeLeft = 10;
+      document.getElementById('timer').textContent = timeLeft;
+      document.getElementById('numberInput').value = '';
+      document.getElementById('feedback').textContent = '';
+      
+      modal.style.display = 'block';
+      
+      // Запуск таймера
+      clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    // Функция закрытия модального окна
+    function closeModal() {
+      clearInterval(timerInterval);
+      document.getElementById('memorizeModal').style.display = 'none';
+    }
+
+    // Обновление таймера
+    function updateTimer() {
+      timeLeft--;
+      document.getElementById('timer').textContent = timeLeft;
+      
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        checkAnswer(true);
+      }
+    }
+
+    // Проверка ответа
+    function checkAnswer(timeout = false) {
+      const userAnswer = document.getElementById('numberInput').value;
+      const feedback = document.getElementById('feedback');
+      
+      if (userAnswer == currentNumber) {
+        feedback.textContent = 'Правильно!';
+        feedback.style.color = '#00ff00';
+        setTimeout(closeModal, 1000);
+        
+        // Здесь можно добавить логику успешного выполнения
+        if (!timeout) alert('Число запомнено верно!');
+        
       } else {
-        // Логика перехода на другую страницу
-        alert('Переход к странице: ' + element.querySelector('div').textContent);
-        // location.href = 'page3.html';
+        feedback.textContent = 'Неправильно!';
+        feedback.style.color = '#ff0000';
+        if (!timeout) alert('Попробуйте еще раз!');
       }
     }
 
     // Драг-н-дроп для контейнера
+    let isDragging = false;
+    let startX, startY;
+    let rotateX = 0, rotateY = 0;
+
+    const circleContainer = document.getElementById('circleContainer');
+
     circleContainer.addEventListener('mousedown', (e) => {
       isDragging = true;
       startX = e.clientX;
@@ -227,12 +342,15 @@
       isDragging = false;
     });
 
-    // Плавное появление элементов
-    document.querySelectorAll('.circle').forEach((circle, index) => {
-      setTimeout(() => {
-        circle.style.opacity = 1;
-        circle.style.transform = 'scale(1)';
-      }, index * 300);
+    // Активация главного круга
+    document.querySelector('.circle-main').addEventListener('click', () => {
+      if (!document.querySelector('.circle-main').classList.contains('active')) return;
+      
+      // После активации разблокируем другие круги
+      document.querySelectorAll('.locked').forEach(circle => {
+        circle.classList.remove('locked');
+        circle.classList.add('active');
+      });
     });
   </script>
 </body>
