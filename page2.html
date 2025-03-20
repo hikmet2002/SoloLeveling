@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Древо навыков</title>
+  <title>Древо навыков с тренировкой</title>
   <style>
     body {
       margin: 0;
@@ -14,25 +14,13 @@
       min-height: 100vh;
     }
 
-    .header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      text-align: center;
-      padding: 20px;
-      font-size: 24px;
-      background: linear-gradient(135deg, #333, #555);
-      box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
-      z-index: 1000;
-    }
-
     .skill-tree-container {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transition: transform 0.1s;
+      cursor: grab;
     }
 
     .skill-node {
@@ -78,9 +66,32 @@
       transform-origin: center;
     }
 
-    .arrow {
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-content {
       position: absolute;
-      border: 4px solid transparent;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      border: 2px solid #ff3333;
+    }
+
+    #timer {
+      font-size: 2em;
+      color: #ffcc00;
+      margin: 20px 0;
     }
 
     /* Узлы древа */
@@ -112,46 +123,6 @@
       left: 50%;
     }
 
-    .arrow1 {
-      top: 190px;
-      left: 240px;
-      border-left-color: #ff6600;
-      transform: rotate(45deg);
-    }
-
-    .arrow2 {
-      top: 190px;
-      right: 240px;
-      border-left-color: #ff6600;
-      transform: rotate(-45deg);
-    }
-
-    /* Контролы перемещения */
-    .controls {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .control-btn {
-      background: #333;
-      border: 2px solid #ff3333;
-      color: #fff;
-      padding: 10px 20px;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: all 0.3s;
-    }
-
-    .control-btn:hover {
-      background: #ff4444;
-    }
-
-    /* Анимации */
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
@@ -163,89 +134,150 @@
   </style>
 </head>
 <body>
-  <div class="header">Древо навыков</div>
-
-  <div class="controls">
-    <button class="control-btn" onclick="moveTree('up')">&#8593;</button>
-    <button class="control-btn" onclick="moveTree('left')">&#8592;</button>
-    <button class="control-btn" onclick="moveTree('right')">&#8594;</button>
-    <button class="control-btn" onclick="moveTree('down')">&#8595;</button>
-  </div>
-
   <div class="skill-tree-container" id="skillTree">
     <!-- Узлы -->
-    <div class="skill-node active" id="node1" onclick="activateNode(this)">
+    <div class="skill-node active" id="node1" data-level="1" data-speed="1" onclick="startTraining(this)">
       <div>Основа</div>
-      <div>Level 1</div>
+      <div>Speed x1</div>
     </div>
-    <div class="skill-node locked" id="node2" onclick="activateNode(this)">
+    <div class="skill-node locked" id="node2" data-level="2" data-speed="2" onclick="startTraining(this)">
       <div>Скорость</div>
-      <div>Level 2</div>
+      <div>Speed x2</div>
     </div>
-    <div class="skill-node locked" id="node3" onclick="activateNode(this)">
+    <div class="skill-node locked" id="node3" data-level="2" data-speed="1.5" onclick="startTraining(this)">
       <div>Сила</div>
-      <div>Level 2</div>
+      <div>Speed x1.5</div>
     </div>
-    <div class="skill-node locked" id="node4" onclick="activateNode(this)">
+    <div class="skill-node locked" id="node4" data-level="3" data-speed="3" onclick="startTraining(this)">
       <div>Ловкость</div>
-      <div>Level 3</div>
+      <div>Speed x3</div>
     </div>
-    <div class="skill-node locked" id="node5" onclick="activateNode(this)">
+    <div class="skill-node locked" id="node5" data-level="3" data-speed="4" onclick="startTraining(this)">
       <div>Интеллект</div>
-      <div>Level 3</div>
+      <div>Speed x4</div>
     </div>
 
     <!-- Линии соединения -->
     <div class="connection-line" id="line1"></div>
     <div class="connection-line" id="line2"></div>
     <div class="connection-line" id="line3"></div>
-    <div class="arrow arrow1"></div>
-    <div class="arrow arrow2"></div>
+  </div>
+
+  <!-- Модальное окно тренировки -->
+  <div id="trainingModal" class="modal">
+    <div class="modal-content">
+      <h2>Запомните число:</h2>
+      <div id="numberDisplay">123456</div>
+      <div id="timer">4</div>
+      <input type="text" id="numberInput" placeholder="Введите число">
+      <button onclick="checkAnswer()">Проверить</button>
+      <div id="feedback"></div>
+    </div>
   </div>
 
   <script>
-    const moveStep = 50;
+    let currentNumber = null;
+    let timerInterval = null;
+    let activeNode = null;
+    let isDragging = false;
+    let dragStartX, dragStartY;
     let treePosition = { x: 0, y: 0 };
 
-    function moveTree(direction) {
-      const tree = document.getElementById('skillTree');
-      const currentTransform = tree.style.transform.replace('translate(', '').replace(')', '').split(', ');
-      let x = currentTransform[0] ? parseFloat(currentTransform[0]) : 0;
-      let y = currentTransform[1] ? parseFloat(currentTransform[1]) : 0;
+    // Инициализация перетаскивания
+    document.getElementById('skillTree').addEventListener('mousedown', (e) => {
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      document.body.style.cursor = 'grabbing';
+    });
 
-      switch(direction) {
-        case 'up': y += moveStep; break;
-        case 'down': y -= moveStep; break;
-        case 'left': x += moveStep; break;
-        case 'right': x -= moveStep; break;
-      }
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const deltaX = e.clientX - dragStartX;
+      const deltaY = e.clientY - dragStartY;
+      treePosition.x += deltaX;
+      treePosition.y += deltaY;
+      document.getElementById('skillTree').style.transform = 
+        `translate(${treePosition.x}px, ${treePosition.y}px)`;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+    });
 
-      tree.style.transform = `translate(${x}px, ${y}px)`;
-      treePosition = { x, y };
-    }
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      document.body.style.cursor = 'grab';
+    });
 
-    function activateNode(node) {
-      if(node.classList.contains('locked')) {
+    // Тренировка памяти
+    function startTraining(node) {
+      if (node.classList.contains('locked')) {
         alert('Сначала активируйте предыдущие навыки!');
         return;
       }
+
+      activeNode = node;
+      currentNumber = Math.floor(Math.random() * 900000) + 100000;
+      const speed = parseFloat(node.getAttribute('data-speed')) || 1;
+      const time = 4 / speed;
+
+      const modal = document.getElementById('trainingModal');
+      const display = document.getElementById('numberDisplay');
+      const timer = document.getElementById('timer');
       
-      // Логика активации навыка
-      alert(`Навык "${node.textContent.trim()}" активирован!`);
-      
-      // Разблокировка следующих навыков
-      if(node.id === 'node1') {
-        document.querySelectorAll('.skill-node').forEach(n => {
-          if(n.id !== 'node1') n.classList.remove('locked');
-        });
-      }
+      display.textContent = currentNumber;
+      timer.textContent = time.toFixed(1);
+      document.getElementById('numberInput').value = '';
+      document.getElementById('feedback').textContent = '';
+      modal.style.display = 'block';
+
+      // Скрытие числа
+      setTimeout(() => {
+        display.style.visibility = 'hidden';
+      }, time * 1000);
+
+      // Таймер
+      let timeLeft = time;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft -= 0.1;
+        timer.textContent = timeLeft.toFixed(1);
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          checkAnswer(true);
+        }
+      }, 100);
     }
 
-    // Инициализация позиции
-    window.addEventListener('load', () => {
-      const tree = document.getElementById('skillTree');
-      tree.style.transform = 'translate(-50%, -50%)';
-    });
+    // Проверка ответа
+    function checkAnswer(timeout = false) {
+      const userAnswer = document.getElementById('numberInput').value;
+      const feedback = document.getElementById('feedback');
+      
+      if (userAnswer == currentNumber) {
+        feedback.textContent = 'Правильно!';
+        feedback.style.color = '#00ff00';
+        activeNode.style.backgroundColor = '#00ff00';
+        activeNode.style.borderColor = '#00ff00';
+        
+        // Разблокировка следующих уровней
+        if(activeNode.id === 'node1') {
+          document.querySelectorAll('.skill-node').forEach(node => {
+            if(node.getAttribute('data-level') === '2') {
+              node.classList.remove('locked');
+            }
+          });
+        }
+        
+        setTimeout(() => {
+          document.getElementById('trainingModal').style.display = 'none';
+          document.getElementById('numberDisplay').style.visibility = 'visible';
+        }, 1000);
+      } else {
+        feedback.textContent = 'Неправильно!';
+        feedback.style.color = '#ff0000';
+        if (!timeout) alert('Попробуйте еще раз!');
+      }
+    }
   </script>
 </body>
 </html>
