@@ -2,31 +2,21 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Древо навыков с тренировкой</title>
+  <title>Тренировка памяти</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       background: #1a1a1a;
-      color: #ff4444;
       font-family: 'Arial', sans-serif;
       overflow: hidden;
       min-height: 100vh;
     }
 
-    .skill-tree-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s;
-      cursor: grab;
-    }
-
     .skill-node {
       position: absolute;
-      width: 120px;
-      height: 120px;
+      width: 150px;
+      height: 150px;
       background: linear-gradient(135deg, #444, #222);
       border: 3px solid #ff3333;
       border-radius: 15px;
@@ -38,32 +28,12 @@
       cursor: pointer;
       box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
       transition: all 0.3s;
-      transform: scale(0.9);
-      opacity: 0.8;
+      opacity: 0.9;
     }
 
-    .skill-node.active {
-      transform: scale(1);
-      opacity: 1;
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
-    }
-
-    .skill-node.locked {
-      opacity: 0.3;
-      border-color: #666;
-      cursor: not-allowed;
-    }
-
-    .skill-node:hover:not(.locked) {
+    .skill-node:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.7);
-    }
-
-    .connection-line {
-      position: absolute;
-      background: linear-gradient(90deg, #ff3333, #ff9933);
-      height: 2px;
-      transform-origin: center;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
     }
 
     .modal {
@@ -73,7 +43,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.9);
     }
 
     .modal-content {
@@ -82,201 +52,155 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background: #222;
-      padding: 20px;
-      border-radius: 10px;
+      border-radius: 15px;
+      padding: 30px;
       text-align: center;
-      border: 2px solid #ff3333;
+      border: 3px solid #ff3333;
+      animation: fadeIn 0.5s;
+    }
+
+    .number-display {
+      font-size: 3em;
+      color: #00ffee;
+      margin: 20px 0;
+      animation: bounce 1s infinite;
     }
 
     #timer {
       font-size: 2em;
       color: #ffcc00;
       margin: 20px 0;
+      animation: pulse 1s infinite;
     }
 
-    /* Узлы древа */
-    #node1 { top: 0; left: 50%; transform: translateX(-50%); }
-    #node2 { top: 200px; left: 150px; }
-    #node3 { top: 200px; right: 150px; }
-    #node4 { top: 400px; left: 0; }
-    #node5 { top: 400px; right: 0; }
-
-    /* Линии соединения */
-    #line1 {
-      width: 2px;
-      height: 200px;
-      top: 60px;
-      left: 50%;
+    .input-container {
+      display: none;
+      animation: fadeIn 0.5s;
     }
 
-    #line2 {
-      width: 200px;
-      height: 2px;
-      top: 260px;
-      left: 50%;
+    .animated-button {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 10px;
+      transition: all 0.3s;
+      animation: pop 0.5s;
     }
 
-    #line3 {
-      width: 200px;
-      height: 2px;
-      top: 460px;
-      left: 50%;
+    .animated-button:hover {
+      transform: scale(1.1);
     }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .skill-node.active {
-      animation: float 3s infinite;
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-30px); }
+      60% { transform: translateY(-15px); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.9); }
+      100% { transform: scale(1); }
     }
   </style>
 </head>
 <body>
-  <div class="skill-tree-container" id="skillTree">
-    <!-- Узлы -->
-    <div class="skill-node active" id="node1" data-level="1" data-speed="1" onclick="startTraining(this)">
-      <div>Основа</div>
-      <div>Speed x1</div>
-    </div>
-    <div class="skill-node locked" id="node2" data-level="2" data-speed="2" onclick="startTraining(this)">
-      <div>Скорость</div>
-      <div>Speed x2</div>
-    </div>
-    <div class="skill-node locked" id="node3" data-level="2" data-speed="1.5" onclick="startTraining(this)">
-      <div>Сила</div>
-      <div>Speed x1.5</div>
-    </div>
-    <div class="skill-node locked" id="node4" data-level="3" data-speed="3" onclick="startTraining(this)">
-      <div>Ловкость</div>
-      <div>Speed x3</div>
-    </div>
-    <div class="skill-node locked" id="node5" data-level="3" data-speed="4" onclick="startTraining(this)">
-      <div>Интеллект</div>
-      <div>Speed x4</div>
-    </div>
-
-    <!-- Линии соединения -->
-    <div class="connection-line" id="line1"></div>
-    <div class="connection-line" id="line2"></div>
-    <div class="connection-line" id="line3"></div>
+  <!-- Узел для демонстрации -->
+  <div class="skill-node" style="top: 50%; left: 50%; transform: translate(-50%, -50%);" onclick="startTraining()">
+    Начать тренировку<br>Speed x2
   </div>
 
-  <!-- Модальное окно тренировки -->
+  <!-- Модальное окно -->
   <div id="trainingModal" class="modal">
     <div class="modal-content">
-      <h2>Запомните число:</h2>
-      <div id="numberDisplay">123456</div>
-      <div id="timer">4</div>
-      <input type="text" id="numberInput" placeholder="Введите число">
-      <button onclick="checkAnswer()">Проверить</button>
-      <div id="feedback"></div>
+      <div id="stage1">
+        <h2>Запомните число:</h2>
+        <div class="number-display" id="numberDisplay">123456</div>
+        <div id="timer">4</div>
+        <button class="animated-button" onclick="nextStage()">Далее</button>
+      </div>
+      <div id="stage2" class="input-container">
+        <h2>Введите число:</h2>
+        <input type="text" id="numberInput" class="animated-button" style="width: 200px;">
+        <button class="animated-button" onclick="checkAnswer()">Проверить</button>
+        <div id="feedback" style="margin-top: 20px;"></div>
+      </div>
     </div>
   </div>
 
   <script>
     let currentNumber = null;
     let timerInterval = null;
-    let activeNode = null;
-    let isDragging = false;
-    let dragStartX, dragStartY;
-    let treePosition = { x: 0, y: 0 };
+    let timeLeft = 4;
+    const speedMultiplier = 2; // Множитель скорости
 
-    // Инициализация перетаскивания
-    document.getElementById('skillTree').addEventListener('mousedown', (e) => {
-      isDragging = true;
-      dragStartX = e.clientX;
-      dragStartY = e.clientY;
-      document.body.style.cursor = 'grabbing';
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const deltaX = e.clientX - dragStartX;
-      const deltaY = e.clientY - dragStartY;
-      treePosition.x += deltaX;
-      treePosition.y += deltaY;
-      document.getElementById('skillTree').style.transform = 
-        `translate(${treePosition.x}px, ${treePosition.y}px)`;
-      dragStartX = e.clientX;
-      dragStartY = e.clientY;
-    });
-
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-      document.body.style.cursor = 'grab';
-    });
-
-    // Тренировка памяти
-    function startTraining(node) {
-      if (node.classList.contains('locked')) {
-        alert('Сначала активируйте предыдущие навыки!');
-        return;
-      }
-
-      activeNode = node;
+    function startTraining() {
       currentNumber = Math.floor(Math.random() * 900000) + 100000;
-      const speed = parseFloat(node.getAttribute('data-speed')) || 1;
-      const time = 4 / speed;
+      timeLeft = 4 / speedMultiplier;
 
       const modal = document.getElementById('trainingModal');
       const display = document.getElementById('numberDisplay');
       const timer = document.getElementById('timer');
       
+      // Сброс и показ первого этапа
+      document.getElementById('stage1').style.display = 'block';
+      document.getElementById('stage2').style.display = 'none';
       display.textContent = currentNumber;
-      timer.textContent = time.toFixed(1);
-      document.getElementById('numberInput').value = '';
-      document.getElementById('feedback').textContent = '';
+      timer.textContent = timeLeft.toFixed(1);
       modal.style.display = 'block';
-
-      // Скрытие числа
-      setTimeout(() => {
-        display.style.visibility = 'hidden';
-      }, time * 1000);
-
+      
+      // Анимация числа
+      display.style.animation = 'bounce 1s infinite';
+      
       // Таймер
-      let timeLeft = time;
-      clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timeLeft -= 0.1;
         timer.textContent = timeLeft.toFixed(1);
-        if (timeLeft <= 0) {
+        
+        if(timeLeft <= 0) {
           clearInterval(timerInterval);
-          checkAnswer(true);
+          nextStage();
         }
       }, 100);
     }
 
-    // Проверка ответа
-    function checkAnswer(timeout = false) {
+    function nextStage() {
+      clearInterval(timerInterval);
+      document.getElementById('stage1').style.display = 'none';
+      document.getElementById('stage2').style.display = 'block';
+      document.getElementById('numberInput').value = '';
+      document.getElementById('feedback').textContent = '';
+    }
+
+    function checkAnswer() {
       const userAnswer = document.getElementById('numberInput').value;
       const feedback = document.getElementById('feedback');
       
-      if (userAnswer == currentNumber) {
+      if(userAnswer == currentNumber) {
         feedback.textContent = 'Правильно!';
         feedback.style.color = '#00ff00';
-        activeNode.style.backgroundColor = '#00ff00';
-        activeNode.style.borderColor = '#00ff00';
-        
-        // Разблокировка следующих уровней
-        if(activeNode.id === 'node1') {
-          document.querySelectorAll('.skill-node').forEach(node => {
-            if(node.getAttribute('data-level') === '2') {
-              node.classList.remove('locked');
-            }
-          });
-        }
-        
-        setTimeout(() => {
-          document.getElementById('trainingModal').style.display = 'none';
-          document.getElementById('numberDisplay').style.visibility = 'visible';
-        }, 1000);
+        setTimeout(() => closeModal(), 1000);
       } else {
         feedback.textContent = 'Неправильно!';
         feedback.style.color = '#ff0000';
-        if (!timeout) alert('Попробуйте еще раз!');
       }
+    }
+
+    function closeModal() {
+      document.getElementById('trainingModal').style.display = 'none';
     }
   </script>
 </body>
