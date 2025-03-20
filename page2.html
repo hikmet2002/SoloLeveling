@@ -2,23 +2,58 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Тренировка памяти</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       background: #1a1a1a;
-      font-family: 'Arial', sans-serif;
+      color: #ff4444;
+      font-family: Arial, sans-serif;
       overflow: hidden;
       min-height: 100vh;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
-
+    .header {
+      position: fixed;
+      top: 0;
+      right: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #333, #555);
+      border-left: 3px solid #ff3333;
+      border-bottom: 3px solid #ff3333;
+      z-index: 1000;
+    }
+    .xp-bar {
+      background: #444;
+      height: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    .xp-progress {
+      height: 100%;
+      background: #00ff00;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .skill-tree-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 20000px; /* Высота для бесконечного дерева */
+      touch-action: none;
+    }
     .skill-node {
       position: absolute;
-      width: 150px;
-      height: 150px;
+      width: 120px;
+      height: 120px;
       background: linear-gradient(135deg, #444, #222);
-      border: 3px solid #ff3333;
+      border: 3px solid #666;
       border-radius: 15px;
       display: flex;
       flex-direction: column;
@@ -26,16 +61,37 @@
       justify-content: center;
       color: #fff;
       cursor: pointer;
-      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
       transition: all 0.3s;
-      opacity: 0.9;
+      opacity: 0.7;
+      -webkit-user-select: none;
+      user-select: none;
     }
-
-    .skill-node:hover {
+    .skill-node.unlocked {
+      opacity: 1;
+      border-color: #ff3333;
+      cursor: pointer;
+    }
+    .skill-node.completed {
+      background: #00ff00 !important;
+      border-color: #00ff00 !important;
+      cursor: default !important;
+      animation: completed 1s infinite;
+    }
+    .skill-node.locked {
+      cursor: not-allowed;
+      opacity: 0.3;
+    }
+    .skill-node:hover:not(.locked):not(.completed) {
       transform: scale(1.05);
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
     }
-
+    .connection-line {
+      position: absolute;
+      background: linear-gradient(90deg, #ff3333, #ff9933);
+      height: 2px;
+      transform-origin: 0 50%;
+    }
     .modal {
       display: none;
       position: fixed;
@@ -44,99 +100,100 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.9);
+      z-index: 2000;
     }
-
     .modal-content {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: #222;
-      border-radius: 15px;
-      padding: 30px;
+      border-radius: 10px;
+      padding: 20px;
       text-align: center;
-      border: 3px solid #ff3333;
+      border: 2px solid #ff3333;
       animation: fadeIn 0.5s;
     }
-
+    .modal-buttons {
+      margin-top: 15px;
+    }
+    .modal-buttons button {
+      margin: 0 5px;
+      padding: 5px 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
     .number-display {
-      font-size: 3em;
+      font-size: 2.5em;
       color: #00ffee;
       margin: 20px 0;
       animation: bounce 1s infinite;
     }
-
     #timer {
-      font-size: 2em;
+      font-size: 1.5em;
       color: #ffcc00;
-      margin: 20px 0;
+      margin: 15px 0;
       animation: pulse 1s infinite;
     }
-
-    .input-container {
-      display: none;
-      animation: fadeIn 0.5s;
+    .hint {
+      color: #aaa;
+      margin-bottom: 15px;
+      font-style: italic;
     }
-
-    .animated-button {
-      background: linear-gradient(135deg, #ff4444, #cc0000);
-      border: none;
-      padding: 10px 20px;
-      color: white;
-      cursor: pointer;
-      border-radius: 5px;
-      margin: 10px;
-      transition: all 0.3s;
-      animation: pop 0.5s;
+    .xp-display {
+      color: #00ff00;
+      font-weight: bold;
+      margin: 10px 0;
     }
-
-    .animated-button:hover {
-      transform: scale(1.1);
-    }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes bounce {
       0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-30px); }
-      60% { transform: translateY(-15px); }
+      40% { transform: translateY(-20px); }
+      60% { transform: translateY(-10px); }
     }
-
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.1); }
       100% { transform: scale(1); }
     }
-
-    @keyframes pop {
-      0% { transform: scale(0.9); }
-      100% { transform: scale(1); }
+    @keyframes completed {
+      0% { box-shadow: 0 0 10px #00ff00; }
+      50% { box-shadow: 0 0 25px #00ff00; }
+      100% { box-shadow: 0 0 10px #00ff00; }
     }
   </style>
 </head>
 <body>
-  <!-- Узел для демонстрации -->
-  <div class="skill-node" style="top: 50%; left: 50%; transform: translate(-50%, -50%);" onclick="startTraining()">
-    Начать тренировку<br>Speed x2
+  <div class="header">
+    <div class="xp-display">Опыт: <span id="xpCounter">0</span></div>
+    <div class="xp-bar"><div class="xp-progress" id="xpProgress"></div></div>
   </div>
+
+  <div class="skill-tree-container" id="skillTree"></div>
 
   <!-- Модальное окно -->
   <div id="trainingModal" class="modal">
     <div class="modal-content">
       <div id="stage1">
-        <h2>Запомните число:</h2>
-        <div class="number-display" id="numberDisplay">123456</div>
+        <div class="hint" id="hint"></div>
+        <div class="number-display" id="numberDisplay">1234</div>
         <div id="timer">4</div>
-        <button class="animated-button" onclick="nextStage()">Далее</button>
+        <div class="modal-buttons">
+          <button onclick="nextStage()">Далее</button>
+          <button onclick="closeModal()">Закрыть</button>
+        </div>
       </div>
-      <div id="stage2" class="input-container">
+      <div id="stage2" style="display: none;">
         <h2>Введите число:</h2>
-        <input type="text" id="numberInput" class="animated-button" style="width: 200px;">
-        <button class="animated-button" onclick="checkAnswer()">Проверить</button>
-        <div id="feedback" style="margin-top: 20px;"></div>
+        <input type="text" id="numberInput">
+        <div class="modal-buttons">
+          <button onclick="checkAnswer()">Проверить</button>
+          <button onclick="closeModal()">Закрыть</button>
+        </div>
+        <div id="feedback" style="margin-top: 15px;"></div>
       </div>
     </div>
   </div>
@@ -144,33 +201,179 @@
   <script>
     let currentNumber = null;
     let timerInterval = null;
-    let timeLeft = 4;
-    const speedMultiplier = 2; // Множитель скорости
+    let activeNode = null;
+    let xp = 0;
+    // currentLevel – номер следующего уровня для прохождения
+    let currentLevel = 1;
 
-    function startTraining() {
-      currentNumber = Math.floor(Math.random() * 900000) + 100000;
-      timeLeft = 4 / speedMultiplier;
+    const skillTree = document.getElementById('skillTree');
 
-      const modal = document.getElementById('trainingModal');
-      const display = document.getElementById('numberDisplay');
-      const timer = document.getElementById('timer');
+    // Функция сохранения прогресса в localStorage
+    function saveProgress() {
+      const data = {
+        xp: xp,
+        currentLevel: currentLevel
+      };
+      localStorage.setItem('memoryTrainerData', JSON.stringify(data));
+    }
+
+    // Функция загрузки прогресса из localStorage
+    function loadProgress() {
+      const data = localStorage.getItem('memoryTrainerData');
+      if (data) {
+        try {
+          const parsed = JSON.parse(data);
+          xp = parsed.xp || 0;
+          currentLevel = parsed.currentLevel || 1;
+          document.getElementById('xpCounter').textContent = xp;
+          const progress = (xp % 100);
+          document.getElementById('xpProgress').style.width = `${progress}%`;
+        } catch (e) {
+          console.error('Ошибка загрузки данных:', e);
+          xp = 0;
+          currentLevel = 1;
+        }
+      }
+    }
+
+    // Функция создания узла уровня
+    function createLevelNode(level) {
+      const node = document.createElement('div');
+      node.classList.add('skill-node');
       
-      // Сброс и показ первого этапа
+      // Вычисляем параметры уровня
+      const speed = 1 + 0.5 * (level - 1);
+      const xpReward = 10 + 5 * (level - 1);
+      const digits = 4 + Math.floor((level - 1) / 2);
+      
+      // Расположение: вертикально с чередованием позиций
+      const topPos = (level - 1) * 200;
+      let leftPos;
+      if (level === 1) {
+        leftPos = "50%";
+        node.style.transform = "translateX(-50%)";
+      } else if (level % 2 === 0) {
+        leftPos = "25%";
+      } else {
+        leftPos = "75%";
+      }
+      
+      node.style.top = topPos + "px";
+      node.style.left = leftPos;
+      
+      node.setAttribute('data-level', level);
+      node.setAttribute('data-speed', speed);
+      node.setAttribute('data-xp', xpReward);
+      node.setAttribute('data-digits', digits);
+      node.setAttribute('data-hint', `Запомните ${digits}-значное число`);
+      
+      node.innerHTML = `Уровень ${level}<br>Speed x${speed.toFixed(1)}`;
+      
+      // Если уровень меньше текущего – считаем его завершённым,
+      // если равен currentLevel – он разблокирован, иначе – заблокирован.
+      if (level < currentLevel) {
+        node.classList.add('completed');
+      } else if (level === currentLevel) {
+        node.classList.add('unlocked');
+      } else {
+        node.classList.add('locked');
+      }
+      
+      node.onclick = function() {
+        startTraining(node);
+      };
+      
+      skillTree.appendChild(node);
+      
+      // Если не первый уровень – создаём линию-соединитель с предыдущим узлом
+      if (level > 1) {
+        const prevNode = document.querySelector(`.skill-node[data-level="${level - 1}"]`);
+        if (prevNode) {
+          createConnectionLine(prevNode, node);
+        }
+      }
+      return node;
+    }
+
+    // Функция создания линии-соединителя между узлами
+    function createConnectionLine(node1, node2) {
+      const line = document.createElement('div');
+      line.classList.add('connection-line');
+      skillTree.appendChild(line);
+      
+      const rect1 = node1.getBoundingClientRect();
+      const rect2 = node2.getBoundingClientRect();
+      const containerRect = skillTree.getBoundingClientRect();
+      
+      const x1 = rect1.left + rect1.width / 2 - containerRect.left;
+      const y1 = rect1.top + rect1.height / 2 - containerRect.top;
+      const x2 = rect2.left + rect2.width / 2 - containerRect.left;
+      const y2 = rect2.top + rect2.height / 2 - containerRect.top;
+      
+      const deltaX = x2 - x1;
+      const deltaY = y2 - y1;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+      
+      line.style.width = distance + "px";
+      line.style.top = y1 + "px";
+      line.style.left = x1 + "px";
+      line.style.transform = `rotate(${angle}deg)`;
+    }
+
+    // Функция обновления всех линий соединения
+    function updateAllConnections() {
+      // Удаляем старые линии
+      document.querySelectorAll('.connection-line').forEach(line => line.remove());
+      // Проходим по всем узлам и пересоздаём линии между соседними уровнями
+      const nodes = document.querySelectorAll('.skill-node');
+      nodes.forEach(node => {
+        const level = parseInt(node.getAttribute('data-level'));
+        if (level > 1) {
+          const prevNode = document.querySelector(`.skill-node[data-level="${level - 1}"]`);
+          if (prevNode) {
+            createConnectionLine(prevNode, node);
+          }
+        }
+      });
+    }
+
+    // Функция закрытия модального окна
+    function closeModal() {
+      clearInterval(timerInterval);
+      document.getElementById('trainingModal').style.display = 'none';
+    }
+
+    // Тренировка памяти
+    function startTraining(node) {
+      if (node.classList.contains('locked') || node.classList.contains('completed')) return;
+      
+      activeNode = node;
+      const speed = parseFloat(node.getAttribute('data-speed')) || 1;
+      const level = parseInt(node.getAttribute('data-level'));
+      const digits = parseInt(node.getAttribute('data-digits'));
+      const xpReward = parseInt(node.getAttribute('data-xp'));
+      
+      const min = Math.pow(10, digits - 1);
+      const max = Math.pow(10, digits) - 1;
+      currentNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+      const time = 4 / speed;
+      
+      document.getElementById('hint').textContent = `Запомните ${digits}-значное число`;
+      document.getElementById('numberDisplay').textContent = currentNumber;
+      document.getElementById('timer').textContent = time.toFixed(1);
       document.getElementById('stage1').style.display = 'block';
       document.getElementById('stage2').style.display = 'none';
-      display.textContent = currentNumber;
-      timer.textContent = timeLeft.toFixed(1);
-      modal.style.display = 'block';
+      document.getElementById('numberInput').value = '';
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('trainingModal').style.display = 'block';
       
-      // Анимация числа
-      display.style.animation = 'bounce 1s infinite';
-      
-      // Таймер
+      let timeLeft = time;
+      clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timeLeft -= 0.1;
-        timer.textContent = timeLeft.toFixed(1);
-        
-        if(timeLeft <= 0) {
+        document.getElementById('timer').textContent = timeLeft.toFixed(1);
+        if (timeLeft <= 0) {
           clearInterval(timerInterval);
           nextStage();
         }
@@ -181,26 +384,119 @@
       clearInterval(timerInterval);
       document.getElementById('stage1').style.display = 'none';
       document.getElementById('stage2').style.display = 'block';
-      document.getElementById('numberInput').value = '';
-      document.getElementById('feedback').textContent = '';
     }
 
     function checkAnswer() {
       const userAnswer = document.getElementById('numberInput').value;
       const feedback = document.getElementById('feedback');
       
-      if(userAnswer == currentNumber) {
+      if (userAnswer == currentNumber) {
         feedback.textContent = 'Правильно!';
         feedback.style.color = '#00ff00';
-        setTimeout(() => closeModal(), 1000);
+        activeNode.classList.add('completed');
+        updateXP(parseInt(activeNode.getAttribute('data-xp')));
+        
+        const completedLevel = parseInt(activeNode.getAttribute('data-level'));
+        const nextLevel = completedLevel + 1;
+        const nextNode = document.querySelector(`.skill-node[data-level="${nextLevel}"]`);
+        if (nextNode) {
+          nextNode.classList.remove('locked');
+          nextNode.classList.add('unlocked');
+        } else {
+          currentLevel = nextLevel;
+          createLevelNode(nextLevel);
+        }
+        saveProgress();
+        updateAllConnections();
+        setTimeout(() => {
+          closeModal();
+        }, 1000);
       } else {
         feedback.textContent = 'Неправильно!';
         feedback.style.color = '#ff0000';
       }
     }
 
-    function closeModal() {
-      document.getElementById('trainingModal').style.display = 'none';
+    // Перетаскивание дерева уровней для десктопа и мобильных устройств
+    let isDragging = false, dragStartX = 0, dragStartY = 0;
+    let treePosition = { x: 0, y: 0 };
+    
+    // Мышь
+    skillTree.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      document.body.style.cursor = 'grabbing';
+      skillTree.style.transition = 'none';
+    });
+    
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const deltaX = e.clientX - dragStartX;
+      const deltaY = e.clientY - dragStartY;
+      treePosition.x += deltaX;
+      treePosition.y += deltaY;
+      skillTree.style.transform = `translate(${treePosition.x}px, ${treePosition.y}px)`;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+    });
+    
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      document.body.style.cursor = 'default';
+      skillTree.style.transition = 'transform 0.3s';
+    });
+    
+    // Касания (моб.)
+    skillTree.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      const touch = e.touches[0];
+      dragStartX = touch.clientX;
+      dragStartY = touch.clientY;
+      skillTree.style.transition = 'none';
+    });
+    
+    skillTree.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - dragStartX;
+      const deltaY = touch.clientY - dragStartY;
+      treePosition.x += deltaX;
+      treePosition.y += deltaY;
+      skillTree.style.transform = `translate(${treePosition.x}px, ${treePosition.y}px)`;
+      dragStartX = touch.clientX;
+      dragStartY = touch.clientY;
+    });
+    
+    skillTree.addEventListener('touchend', () => {
+      isDragging = false;
+      skillTree.style.transition = 'transform 0.3s';
+    });
+
+    // При загрузке приложения – загрузка прогресса и построение дерева
+    document.addEventListener("DOMContentLoaded", () => {
+      loadProgress();
+      // Создаем уровни от 1 до (currentLevel - 1) как завершенные
+      for (let level = 1; level < currentLevel; level++) {
+        createLevelNode(level);
+        const node = document.querySelector(`.skill-node[data-level="${level}"]`);
+        if (node) {
+          node.classList.add('completed');
+        }
+      }
+      // Создаем текущий уровень, который доступен для прохождения
+      createLevelNode(currentLevel);
+      updateAllConnections();
+    });
+
+    // Обновление XP и прогресс-бара
+    function updateXP(amount) {
+      xp += amount;
+      document.getElementById('xpCounter').textContent = xp;
+      const progress = (xp % 100);
+      document.getElementById('xpProgress').style.width = `${progress}%`;
     }
   </script>
 </body>
