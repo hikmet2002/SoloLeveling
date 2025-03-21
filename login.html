@@ -92,12 +92,21 @@
       let users = JSON.parse(localStorage.getItem('users')) || [];
       
       // Проверяем, существует ли уже пользователь с таким логином
-      if (users.some(user => user.username === username)) {
-        alert("Пользователь с таким логином уже существует!");
-        return;
+      const existingUser = users.find(user => user.username === username);
+      
+      if (existingUser) {
+        // Если пароль совпадает, то пропускаем регистрацию и авторизуем пользователя
+        if (existingUser.password === password) {
+          localStorage.setItem('userData', JSON.stringify(existingUser));
+          window.location.href = 'userinfo.html';
+          return;
+        } else {
+          alert("Пользователь с таким логином уже существует, но пароль не совпадает!");
+          return;
+        }
       }
       
-      // Формируем данные нового пользователя
+      // Если пользователь не найден, создаём нового
       const userData = {
         username,
         password,
