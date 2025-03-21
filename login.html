@@ -85,9 +85,19 @@
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
       
-      const username = document.getElementById('username').value;
+      const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
       
+      // Получаем список пользователей из localStorage, если он есть
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      
+      // Проверяем, существует ли уже пользователь с таким логином
+      if (users.some(user => user.username === username)) {
+        alert("Пользователь с таким логином уже существует!");
+        return;
+      }
+      
+      // Формируем данные нового пользователя
       const userData = {
         username,
         password,
@@ -97,8 +107,14 @@
           skills: []
         }
       };
-      
+
+      // Добавляем нового пользователя в список
+      users.push(userData);
+      // Сохраняем обновлённый список пользователей в localStorage
+      localStorage.setItem('users', JSON.stringify(users));
+      // Сохраняем данные текущего пользователя для дальнейшего использования
       localStorage.setItem('userData', JSON.stringify(userData));
+      
       window.location.href = 'userinfo.html';
     });
   </script>
