@@ -5,15 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Поднятие уровня в одиночку – Главная</title>
   <style>
-    /* =================== Интерфейс и стили (HTML + CSS) =================== */
-
     /* Сброс стилей */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
+    /* Кнопка регистрации в верхнем левом углу */
+    .reg-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #00ccff;
+      color: #0d0d0d;
+      padding: 8px 15px;
+      border-radius: 5px;
+      border: 1px solid #00ccff;
+      box-shadow: 0 0 10px rgba(0,204,255,0.5);
+      cursor: pointer;
+      z-index: 10000;
+      text-decoration: none;
+      font-size: 16px;
+    }
     /* Анимации */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -28,23 +41,8 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
     /* Фон с анимированным градиентом и звёздным полем */
     body {
-<script>
-  // Проверка авторизации
-  window.onload = function() {
-    const userData = JSON.parse(localStorage.getItem('userData'));
-    if(!userData) {
-      window.location.href = 'login.html';
-    }
-  };
-</script>
-
-<!-- Добавить в header -->
-<div style="position: fixed; top: 20px; left: 20px">
-  <a href="userinfo.html" class="btn">Профиль</a>
-</div>
       font-family: Arial, sans-serif;
       background: linear-gradient(270deg, #0a0a0a, #101010, #0a0a0a);
       background-size: 400% 400%;
@@ -55,7 +53,7 @@
       position: relative;
       min-height: 100vh;
     }
-    /* Canvas для звёздного поля */
+    /* Canvas для звездного поля */
     #starsCanvas {
       position: fixed;
       top: 0;
@@ -65,27 +63,24 @@
       z-index: -100;
       pointer-events: none;
     }
-
     /* Заголовок приложения */
     .header {
       text-align: center;
       font-size: 28px;
       font-weight: bold;
-      margin-top: 40px;
+      margin-top: 60px;
       margin-bottom: 20px;
       color: #00ccff;
       text-shadow: 0 0 8px #00ccff;
       animation: fadeIn 0.5s ease;
     }
-
-    /* Изображение сайта (файл 202654381.png) */
+    /* Изображение сайта */
     .site-image {
       display: block;
       margin: 0 auto 20px;
       max-width: 100%;
       height: auto;
     }
-
     /* Кнопка копирования JSON */
     .export-btn {
       display: inline-block;
@@ -105,8 +100,7 @@
     .export-btn:active {
       transform: scale(0.95);
     }
-
-    /* Кнопка «Прокачка» в правом верхнем углу */
+    /* Кнопка «Прокачка» */
     .upgrade-btn {
       position: fixed;
       top: 20px;
@@ -126,8 +120,7 @@
       background: #00aee0;
       box-shadow: 0 0 15px rgba(0,204,255,0.7);
     }
-
-    /* Контейнер навыков с навигационными кнопками */
+    /* Блок навыков */
     .skill-container {
       display: flex;
       align-items: center;
@@ -152,8 +145,6 @@
       background: #00aee0;
       box-shadow: 0 0 20px rgba(0,204,255,0.7);
     }
-
-    /* Блок навыка */
     .skill-block {
       background: rgba(0, 0, 0, 0.4);
       border: 2px solid #00ccff;
@@ -176,7 +167,6 @@
       color: #00ccff;
       text-shadow: 0 0 5px #00ccff;
     }
-    /* Дополнительный стиль для дефолтного навыка (отображается красным) */
     .default-skill {
       border-color: red !important;
     }
@@ -209,7 +199,6 @@
     .skill-exp .exp-square.filled {
       background: #00ccff;
     }
-
     /* Блок заданий */
     .task-section {
       background: rgba(0, 0, 0, 0.4);
@@ -252,8 +241,6 @@
       background: #00aee0;
       box-shadow: 0 0 15px rgba(0,204,255,0.7);
     }
-
-    /* Каждый элемент задания */
     .task-item {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid #00ccff;
@@ -312,7 +299,6 @@
       background: #218838;
       box-shadow: 0 0 15px rgba(40,167,69,0.6);
     }
-
     /* Блок таймера */
     .timer-section {
       background: rgba(0, 0, 0, 0.4);
@@ -367,7 +353,6 @@
       color: #fff;
       text-align: center;
     }
-
     /* Модальные окна */
     .modal-overlay {
       position: fixed;
@@ -433,7 +418,6 @@
       background: #e60040;
       box-shadow: 0 0 15px rgba(255,46,99,0.6);
     }
-
     /* Уведомления */
     .notification {
       position: fixed;
@@ -448,7 +432,6 @@
       display: none;
       z-index: 9999;
     }
-
     /* Мобильная адаптация */
     @media (max-width: 600px) {
       .header { font-size: 20px; }
@@ -464,36 +447,28 @@
       .timer-display { font-size: 2em; }
       .timer-inputs input { width: 50px; }
     }
-
-    /* Дополнительный стиль для дефолтного навыка (отображается красным) */
-    .default-skill {
-      border-color: red !important;
-    }
-    .default-skill h2 {
-      color: red !important;
-      text-shadow: 0 0 5px red !important;
-    }
-
-    /* =================== Конец интерфейсной части =================== */
   </style>
 </head>
 <body>
   <!-- Canvas для звездного поля -->
   <canvas id="starsCanvas"></canvas>
+  
+  <!-- Кнопка регистрации (при клике переход на login.html) -->
+  <a href="login.html" class="reg-btn" id="regBtn">Регистрация</a>
 
-  <!-- Верхняя надпись -->
+  <!-- Заголовок -->
   <div class="header">Поднятие уровня в одиночку</div>
-
-  <!-- Изображение сайта (файл 202654381.png) -->
+  
+  <!-- Изображение сайта -->
   <img src="202654381.png" alt="Изображение сайта" class="site-image" />
-
+  
   <!-- Кнопка копирования JSON -->
   <button class="export-btn" onclick="copyDataAsJSON()">Копировать JSON</button>
-
-  <!-- Кнопка "Прокачка" в правом верхнем углу -->
+  
+  <!-- Кнопка «Прокачка» -->
   <button class="upgrade-btn" onclick="location.href='page2.html'">Прокачка</button>
-
-  <!-- Контейнер навыков с навигационными стрелками -->
+  
+  <!-- Блок навыков -->
   <div class="skill-container">
     <button class="nav-btn" onclick="prevSkill()">&lt;</button>
     <div class="skill-block" id="skillBlock" onclick="openSkillModal()">
@@ -511,7 +486,7 @@
     </div>
     <button class="nav-btn" onclick="nextSkill()">&gt;</button>
   </div>
-
+  
   <!-- Блок заданий -->
   <div class="task-section">
     <h3>Задания</h3>
@@ -523,7 +498,7 @@
     </div>
     <div id="taskList"></div>
   </div>
-
+  
   <!-- Блок таймера -->
   <div class="timer-section">
     <h3>Таймер</h3>
@@ -539,7 +514,7 @@
       <input type="number" id="secondsInput" placeholder="Секунды" min="0" value="0" />
     </div>
   </div>
-
+  
   <!-- Модальное окно для редактирования навыка -->
   <div class="modal-overlay" id="skillModalOverlay">
     <div class="modal">
@@ -556,7 +531,7 @@
       <button class="close-btn" onclick="closeSkillModal()">Отмена</button>
     </div>
   </div>
-
+  
   <!-- Модальное окно для редактирования задания -->
   <div class="modal-overlay" id="taskModalOverlay">
     <div class="modal">
@@ -571,20 +546,29 @@
       <button class="close-btn" onclick="closeTaskModal()">Отмена</button>
     </div>
   </div>
-
-  <!-- =================== Функциональный код (JavaScript) =================== -->
+  
+  <!-- Скрипты -->
   <script>
-    /* =================== Часть 0: Звездное поле (canvas) =================== */
+    // При загрузке страницы проверяем авторизацию
+    window.addEventListener('load', () => {
+      const userData = JSON.parse(localStorage.getItem('userData'));
+      if(userData) {
+        // Если пользователь авторизован, меняем текст кнопки на логин пользователя
+        document.getElementById('regBtn').textContent = userData.username;
+      }
+    });
+    
+    /* =================== Звездное поле (canvas) =================== */
     const canvas = document.getElementById("starsCanvas");
     const ctx = canvas.getContext("2d");
-
+    
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
-
+    
     const stars = [];
     const numStars = 300;
     for (let i = 0; i < numStars; i++) {
@@ -596,7 +580,7 @@
         vy: (Math.random() - 0.5) * 0.3
       });
     }
-
+    
     const galaxies = [];
     const numGalaxies = 5;
     for (let i = 0; i < numGalaxies; i++) {
@@ -608,7 +592,7 @@
         vy: (Math.random() - 0.5) * 0.1
       });
     }
-
+    
     function animateStarfield() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       // Рисуем звёзды
@@ -646,14 +630,14 @@
       requestAnimationFrame(animateStarfield);
     }
     animateStarfield();
-
-    /* =================== Часть 1: Работа с данными и localStorage =================== */
+    
+    /* =================== Работа с данными и localStorage =================== */
     const STORAGE_KEY = "levelUpData";
     let data = {
       skills: [],
       tasks: []
     };
-
+    
     if (localStorage.getItem(STORAGE_KEY)) {
       data = JSON.parse(localStorage.getItem(STORAGE_KEY));
     } else {
@@ -668,16 +652,17 @@
       });
       saveData();
     }
-
+    
     let currentSkillIndex = 0;
     let currentTaskId = null;
-
+    
     function saveData() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
     function generateId() {
       return '_' + Math.random().toString(36).substr(2, 9);
     }
+    
     // Функция копирования JSON в буфер обмена
     function copyDataAsJSON() {
       const jsonStr = JSON.stringify(data, null, 2);
@@ -685,8 +670,8 @@
         .then(() => showNotification("JSON скопирован в буфер обмена!"))
         .catch((err) => console.error("Ошибка копирования JSON:", err));
     }
-
-    /* =================== Часть 2: Рендер и редактирование навыков =================== */
+    
+    /* =================== Рендер и редактирование навыков =================== */
     function renderSkill() {
       if (data.skills.length === 0) {
         data.skills.push({
@@ -711,7 +696,6 @@
           sq.classList.remove("filled");
         }
       });
-      // Если навык дефолтный, добавляем красный стиль
       const skillBlock = document.getElementById("skillBlock");
       if (skill.default) {
         skillBlock.classList.add("default-skill");
@@ -730,7 +714,6 @@
       saveData();
       renderSkill();
     }
-
     function prevSkill() {
       if (currentSkillIndex > 0) {
         currentSkillIndex--;
@@ -758,10 +741,8 @@
       currentSkillIndex = data.skills.length - 1;
       saveData();
     }
-
     function openSkillModal() {
       const skill = data.skills[currentSkillIndex];
-      // Если дефолтный навык, переходим на page2.html
       if (skill.default) {
         location.href = 'page2.html';
         return;
@@ -781,14 +762,12 @@
       skill.level = parseInt(document.getElementById("skillLevelInput").value) || 1;
       skill.exp = parseInt(document.getElementById("skillExpInput").value) || 0;
       skill.desc = document.getElementById("skillDescInput").value;
-      // После редактирования навык уже не дефолтный
       skill.default = false;
       saveData();
       closeSkillModal();
       renderSkill();
       showNotification("Навык сохранён!");
     }
-
     function checkLevelUp() {
       const skill = data.skills[currentSkillIndex];
       if (skill.exp >= 5) {
@@ -797,8 +776,8 @@
         showNotification(`Уровень повышен до ${skill.level}!`);
       }
     }
-
-    /* =================== Часть 3: Рендер и редактирование заданий =================== */
+    
+    /* =================== Рендер и редактирование заданий =================== */
     function renderTasks() {
       const taskList = document.getElementById("taskList");
       taskList.innerHTML = "";
@@ -806,40 +785,40 @@
         const div = document.createElement("div");
         div.className = "task-item";
         div.dataset.id = task.id;
-
+    
         const infoBlock = document.createElement("div");
         infoBlock.className = "task-info-block";
-
+    
         const nameSpan = document.createElement("span");
         nameSpan.className = "task-name";
         nameSpan.innerText = task.name;
-
+    
         const rewardSpan = document.createElement("span");
         rewardSpan.className = "task-reward";
         rewardSpan.innerText = task.reward ? `Награда: ${task.reward} XP` : "Награда: —";
-
+    
         const descSpan = document.createElement("span");
         descSpan.className = "task-desc";
         descSpan.innerText = task.desc ? `Описание: ${task.desc}` : "Описание: —";
-
+    
         infoBlock.appendChild(nameSpan);
         infoBlock.appendChild(rewardSpan);
         infoBlock.appendChild(descSpan);
         div.appendChild(infoBlock);
-
+    
         const btnGroup = document.createElement("div");
         btnGroup.className = "btn-group";
-
+    
         const completeBtn = document.createElement("button");
         completeBtn.className = "complete-btn";
         completeBtn.innerText = "выполнено";
         completeBtn.onclick = () => completeTask(task.id);
-
+    
         const editBtn = document.createElement("button");
         editBtn.className = "edit-btn";
         editBtn.innerText = "ред.";
         editBtn.onclick = () => openTaskModal(task.id);
-
+    
         const deleteBtn = document.createElement("button");
         deleteBtn.className = "delete-btn";
         deleteBtn.innerText = "удалить";
@@ -849,12 +828,12 @@
           renderTasks();
           showNotification("Задание удалено!");
         };
-
+    
         btnGroup.appendChild(completeBtn);
         btnGroup.appendChild(editBtn);
         btnGroup.appendChild(deleteBtn);
         div.appendChild(btnGroup);
-
+    
         taskList.appendChild(div);
       });
     }
@@ -923,11 +902,11 @@
       renderTasks();
       showNotification("Задание обновлено!");
     }
-
-    /* =================== Часть 3: Таймер =================== */
+    
+    /* =================== Таймер =================== */
     let timerInterval = null;
     let remainingTime = { hours: 0, minutes: 0, seconds: 0 };
-
+    
     function startTimer() {
       const hours = parseInt(document.getElementById("hoursInput").value) || 0;
       const minutes = parseInt(document.getElementById("minutesInput").value) || 0;
@@ -986,8 +965,8 @@
       const s = String(time.seconds).padStart(2, '0');
       return `${h}:${m}:${s}`;
     }
-
-    /* =================== Часть 4: Уведомления =================== */
+    
+    /* =================== Уведомления =================== */
     function showNotification(message) {
       const notification = document.createElement("div");
       notification.className = "notification";
@@ -999,7 +978,7 @@
         document.body.removeChild(notification);
       }, 3000);
     }
-
+    
     /* =================== INITIAL RENDER =================== */
     renderSkill();
     renderTasks();
