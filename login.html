@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация</title>
+  <style>
+    /* Стили из index.html */
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(270deg, #0a0a0a, #101010, #0a0a0a);
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .auth-container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,204,255,0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .auth-form input {
+      padding: 10px;
+      border: 1px solid #00ccff;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .auth-form button {
+      padding: 12px;
+      background: #00ccff;
+      border: none;
+      border-radius: 5px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .auth-form button:hover {
+      background: #00aee0;
+    }
+
+    .links {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .links a {
+      color: #00ccff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <form class="auth-form" id="loginForm">
+      <h2 style="text-align: center; color: #00ccff">Регистрация</h2>
+      <input type="text" id="username" placeholder="Логин" required>
+      <input type="password" id="password" placeholder="Пароль" required>
+      <button type="submit">Зарегистрироваться</button>
+    </form>
+    <div class="links">
+      <a href="index.html">Войти как гость</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      const userData = {
+        username,
+        password,
+        profile: {
+          level: 1,
+          xp: 0,
+          skills: []
+        }
+      };
+      
+      localStorage.setItem('userData', JSON.stringify(userData));
+      window.location.href = 'userinfo.html';
+    });
+  </script>
+</body>
+</html>
