@@ -145,6 +145,30 @@
       font-weight: bold;
       margin: 10px 0;
     }
+    .home-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      font-size: 24px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      text-decoration: none;
+      color: #ff4444;
+      background: rgba(0,0,0,0.7);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(255,68,68,0.5);
+    }
+    .home-button:hover {
+      transform: scale(1.1);
+      background: rgba(255,68,68,0.2);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -167,6 +191,8 @@
   </style>
 </head>
 <body>
+  <a href="index.html" class="home-button">🏠</a>
+
   <div class="header">
     <div class="xp-display">Опыт: <span id="xpCounter">0</span></div>
     <div class="xp-bar"><div class="xp-progress" id="xpProgress"></div></div>
@@ -428,7 +454,6 @@
       document.getElementById('xpProgress').style.width = `${progress}%`;
     }
 
-    // Обработчики перетаскивания
     skillTree.addEventListener('mousedown', (e) => {
       isDragging = true;
       dragStartX = e.clientX;
@@ -481,7 +506,6 @@
       skillTree.style.transition = 'transform 0.3s';
     });
 
-    // Инициализация
     document.addEventListener("DOMContentLoaded", () => {
       loadProgress();
       for (let level = 1; level < currentLevel; level++) {
