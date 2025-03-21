@@ -31,6 +31,20 @@
 
     /* Фон с анимированным градиентом и звёздным полем */
     body {
+<script>
+  // Проверка авторизации
+  window.onload = function() {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    if(!userData) {
+      window.location.href = 'login.html';
+    }
+  };
+</script>
+
+<!-- Добавить в header -->
+<div style="position: fixed; top: 20px; left: 20px">
+  <a href="userinfo.html" class="btn">Профиль</a>
+</div>
       font-family: Arial, sans-serif;
       background: linear-gradient(270deg, #0a0a0a, #101010, #0a0a0a);
       background-size: 400% 400%;
