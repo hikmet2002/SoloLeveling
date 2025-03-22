@@ -617,8 +617,25 @@
       tasks: []
     };
     
+    // Функция для обеспечения наличия дефолтного навыка
+    function ensureDefaultSkill() {
+      const defaultExists = data.skills.some(skill => skill.default);
+      if (!defaultExists) {
+        data.skills.push({
+          id: generateId(),
+          name: "Default Skill",
+          level: 1,
+          exp: 0,
+          desc: "Это дефолтный навык. Нажмите для прокачки.",
+          default: true
+        });
+      }
+    }
+    
     if (localStorage.getItem(STORAGE_KEY)) {
       data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      ensureDefaultSkill();
+      saveData();
     } else {
       // Создаем дефолтный навык с пометкой default
       data.skills.push({
@@ -673,8 +690,9 @@
       reader.onload = (e) => {
         try {
           const uploadedData = JSON.parse(e.target.result);
-          // При желании можно добавить проверку структуры данных
+          // При загрузке данных проверяем наличие дефолтного навыка
           data = uploadedData;
+          ensureDefaultSkill();
           saveData();
           renderSkill();
           renderTasks();
@@ -1026,4 +1044,3 @@
   </script>
 </body>
 </html>
-
