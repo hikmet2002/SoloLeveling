@@ -1,33 +1,82 @@
-<!-- userinfo.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Информация о пользователе</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(270deg, #0a0a0a, #101010, #0a0a0a);
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .userinfo-container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,204,255,0.3);
+      width: 100%;
+      max-width: 600px;
+    }
+    .userinfo-header {
+      text-align: center;
+      color: #00ccff;
+    }
+    .userinfo-section {
+      margin-top: 20px;
+    }
+    .userinfo-section h3 {
+      margin-bottom: 10px;
+      color: #00ccff;
+    }
+    .userinfo-data {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 5px;
+    }
+    .back-link {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .back-link a {
+      color: #00ccff;
+      text-decoration: none;
+    }
+  </style>
 </head>
 <body>
-  <h1>Информация о пользователе</h1>
-  <div id="userInfo"></div>
+  <div class="userinfo-container">
+    <h2 class="userinfo-header">Информация о пользователе</h2>
+    <div class="userinfo-section" id="userInfo">
+      <!-- Данные пользователя появятся здесь -->
+    </div>
+    <div class="back-link">
+      <a href="index.html">Выйти</a>
+    </div>
+  </div>
 
   <script>
-    fetch('users.json')               // Путь к JSON-файлу
-      .then(response => response.json())
-      .then(users => {
-        // Предположим, что users.json – это массив пользователей
-        // Вывести первого пользователя (пример)
-        if (users.length > 0) {
-          const user = users[0];      // или искать конкретного
-          document.getElementById('userInfo').innerHTML = `
-            <p><strong>Логин:</strong> ${user.username}</p>
-            <p><strong>Пароль:</strong> ${user.password}</p>
-          `;
-        } else {
-          document.getElementById('userInfo').textContent = 'Пользователей нет';
-        }
-      })
-      .catch(error => {
-        console.error('Ошибка при чтении JSON:', error);
-      });
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    const userInfoDiv = document.getElementById('userInfo');
+
+    if (userData) {
+      userInfoDiv.innerHTML = `
+        <div class="userinfo-data">
+          <p><strong>Логин:</strong> ${userData.username}</p>
+          <p><strong>Уровень:</strong> ${userData.profile.level}</p>
+          <p><strong>Опыт (XP):</strong> ${userData.profile.xp}</p>
+          <p><strong>Навыки:</strong> ${userData.profile.skills.length ? userData.profile.skills.join(', ') : 'Нет навыков'}</p>
+        </div>
+      `;
+    } else {
+      userInfoDiv.innerHTML = `<p>Данные пользователя не найдены. Пожалуйста, зарегистрируйтесь.</p>`;
+    }
   </script>
 </body>
 </html>
