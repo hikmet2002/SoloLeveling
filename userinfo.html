@@ -54,7 +54,7 @@
   <div class="userinfo-container">
     <h2 class="userinfo-header">Информация о пользователе</h2>
     <div class="userinfo-section" id="userInfo">
-      <!-- Здесь будут отображены данные пользователя -->
+      <!-- Данные пользователя появятся здесь -->
     </div>
     <div class="back-link">
       <a href="index.html">Выйти</a>
@@ -62,7 +62,6 @@
   </div>
 
   <script>
-    // Получаем данные текущего пользователя из localStorage
     const userData = JSON.parse(localStorage.getItem('userData'));
     const userInfoDiv = document.getElementById('userInfo');
 
