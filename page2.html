@@ -109,19 +109,31 @@
       transform: translate(-50%, -50%);
       background: #222;
       border-radius: 10px;
-      padding: 20px;
+      padding: 25px 30px;
       text-align: center;
       border: 2px solid #ff3333;
+      box-shadow: 0 0 15px rgba(255, 51, 51, 0.7);
       animation: fadeIn 0.5s;
+      max-width: 90%;
     }
     .modal-buttons {
-      margin-top: 15px;
+      margin-top: 20px;
     }
     .modal-buttons button {
-      margin: 0 5px;
-      padding: 5px 10px;
+      margin: 0 7px;
+      padding: 8px 15px;
       font-size: 1em;
       cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: linear-gradient(135deg, #333, #555);
+      color: #ff4444;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .modal-buttons button:hover {
+      background: #ff3333;
+      color: #fff;
+      transform: scale(1.05);
     }
     .number-display {
       font-size: 2.5em;
@@ -168,7 +180,6 @@
       transform: scale(1.1);
       background: rgba(255,68,68,0.2);
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -205,16 +216,17 @@
       <div id="stage1">
         <div class="hint" id="hint"></div>
         <div class="number-display" id="numberDisplay">1234</div>
-        <div id="timer">4</div>
+        <div id="timer">4.0</div>
         <div class="modal-buttons">
           <button onclick="nextStage()">Далее</button>
           <button onclick="closeModal()">Закрыть</button>
+          <button onclick="addExtraTime()">+3 сек</button>
         </div>
       </div>
       <div id="stage2" style="display: none;">
         <h2>Введите ответ:</h2>
-        <input type="text" id="numberInput">
-        <div class="modal-buttons">
+        <input type="text" id="numberInput" style="padding: 5px; font-size: 1em; border-radius: 3px; border: 1px solid #555;">
+        <div class="modal-buttons" style="margin-top: 15px;">
           <button onclick="checkAnswer()">Проверить</button>
           <button onclick="closeModal()">Закрыть</button>
         </div>
@@ -229,6 +241,7 @@
     let activeNode = null;
     let xp = 0;
     let currentLevel = 1;
+    let timeLeft = 0; // глобальная переменная для оставшегося времени
     const skillTree = document.getElementById('skillTree');
     const words = ['ПАМЯТЬ', 'КОД', 'ТРЕНИРОВКА', 'МОЗГ', 'ЛОГИКА', 'ВЕТКА', 'ПРОГРЕСС', 'СЛОВО', 'БУКВА', 'ТЕСТ'];
     const consonants = 'БВГДЖЗКЛМНПРСТФХЦЧШЩ';
@@ -385,10 +398,11 @@
       }
       
       const time = 4 / speed;
+      timeLeft = time; // задаём глобальное время
       
       document.getElementById('hint').textContent = node.getAttribute('data-hint');
       document.getElementById('numberDisplay').textContent = currentNumber;
-      document.getElementById('timer').textContent = time.toFixed(1);
+      document.getElementById('timer').textContent = timeLeft.toFixed(1);
       document.getElementById('stage2').querySelector('h2').textContent = 
         isWordLevel ? 'Введите слово:' : 'Введите число:';
       
@@ -398,7 +412,6 @@
       document.getElementById('feedback').textContent = '';
       document.getElementById('trainingModal').style.display = 'block';
       
-      let timeLeft = time;
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timeLeft -= 0.1;
@@ -408,6 +421,12 @@
           nextStage();
         }
       }, 100);
+    }
+
+    // Функция для добавления дополнительного времени +3 секунды
+    function addExtraTime() {
+      timeLeft += 3;
+      document.getElementById('timer').textContent = timeLeft.toFixed(1);
     }
 
     function nextStage() {
