@@ -4,56 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Поднятие уровня в одиночку – Главная</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Сброс стилей */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    /* Кнопка регистрации в верхнем левом углу */
-    .reg-btn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: #00ccff;
-      color: #0d0d0d;
-      padding: 8px 15px;
-      border-radius: 5px;
-      border: 1px solid #00ccff;
-      box-shadow: 0 0 10px rgba(0,204,255,0.5);
-      cursor: pointer;
-      z-index: 10000;
-      text-decoration: none;
-      font-size: 16px;
-    }
-    /* Анимации */
+    /* Custom CSS for elements that can't be done with Tailwind */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    
     @keyframes neonFlicker {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.95; }
     }
+    
     @keyframes moveBackground {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    /* Фон с анимированным градиентом и звёздным полем */
+    
+    @keyframes slideInFromLeft {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+    
     body {
-      font-family: Arial, sans-serif;
       background: linear-gradient(270deg, #0a0a0a, #101010, #0a0a0a);
       background-size: 400% 400%;
       animation: moveBackground 20s ease infinite;
-      color: #e0e0e0;
-      padding: 10px;
+      font-family: 'Inter', sans-serif;
       overflow-x: hidden;
-      position: relative;
-      min-height: 100vh;
     }
-    /* Canvas для звездного поля */
+    
     #starsCanvas {
       position: fixed;
       top: 0;
@@ -63,303 +45,7 @@
       z-index: -100;
       pointer-events: none;
     }
-    /* Заголовок приложения */
-    .header {
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-      margin-top: 60px;
-      margin-bottom: 20px;
-      color: #00ccff;
-      text-shadow: 0 0 8px #00ccff;
-      animation: fadeIn 0.5s ease;
-    }
-    /* Изображение сайта */
-    .site-image {
-      display: block;
-      margin: 0 auto 20px;
-      max-width: 100%;
-      height: auto;
-    }
-    /* Кнопки для работы с JSON */
-    .export-btn,
-    .download-btn,
-    .upload-btn {
-      display: inline-block;
-      margin-bottom: 20px;
-      background: #00ccff;
-      color: #0d0d0d;
-      padding: 8px 12px;
-      border-radius: 4px;
-      box-shadow: 0 0 10px rgba(0,204,255,0.5);
-      transition: box-shadow 0.2s, transform 0.1s;
-      cursor: pointer;
-    }
-    .export-btn:hover,
-    .download-btn:hover,
-    .upload-btn:hover {
-      background: #00aee0;
-      box-shadow: 0 0 15px rgba(0,204,255,0.7);
-    }
-    .export-btn:active,
-    .download-btn:active,
-    .upload-btn:active {
-      transform: scale(0.95);
-    }
-    /* Кнопка «Прокачка» */
-    .upgrade-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #00ccff;
-      color: #0d0d0d;
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
-      box-shadow: 0 0 10px rgba(0,204,255,0.5);
-      cursor: pointer;
-      transition: 0.3s;
-      z-index: 1000;
-    }
-    .upgrade-btn:hover {
-      background: #00aee0;
-      box-shadow: 0 0 15px rgba(0,204,255,0.7);
-    }
-    /* Блок навыков */
-    .skill-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      animation: fadeIn 0.5s ease;
-    }
-    .nav-btn {
-      font-size: 24px;
-      background: #00ccff;
-      color: #0d0d0d;
-      padding: 10px;
-      border-radius: 50%;
-      margin: 0 5px;
-      min-width: 40px;
-      min-height: 40px;
-      box-shadow: 0 0 10px rgba(0,204,255,0.5);
-      transition: box-shadow 0.3s, transform 0.2s;
-      cursor: pointer;
-    }
-    .nav-btn:hover {
-      background: #00aee0;
-      box-shadow: 0 0 20px rgba(0,204,255,0.7);
-    }
-    .skill-block {
-      background: rgba(0, 0, 0, 0.4);
-      border: 2px solid #00ccff;
-      border-radius: 8px;
-      padding: 15px;
-      flex: 1;
-      position: relative;
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(0,204,255,0.3);
-      animation: neonFlicker 2s infinite alternate;
-      transition: transform 0.3s;
-    }
-    .skill-block:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 25px rgba(0,204,255,0.5);
-    }
-    .skill-block h2 {
-      font-size: 20px;
-      margin-bottom: 10px;
-      color: #00ccff;
-      text-shadow: 0 0 5px #00ccff;
-    }
-    .default-skill {
-      border-color: red !important;
-    }
-    .default-skill h2 {
-      color: red !important;
-      text-shadow: 0 0 5px red !important;
-    }
-    .skill-info {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .skill-level {
-      font-size: 16px;
-      font-weight: bold;
-      color: #e0e0e0;
-    }
-    .skill-exp {
-      display: flex;
-      gap: 5px;
-    }
-    .skill-exp .exp-square {
-      width: 25px;
-      height: 25px;
-      border: 1px solid #00ccff;
-      border-radius: 3px;
-      background: #141414;
-      transition: background 0.2s;
-    }
-    .skill-exp .exp-square.filled {
-      background: #00ccff;
-    }
-    /* Блок заданий */
-    .task-section {
-      background: rgba(0, 0, 0, 0.4);
-      border: 2px solid #00ccff;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 15px rgba(0,204,255,0.3);
-      animation: neonFlicker 2s infinite alternate;
-    }
-    .task-section h3 {
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #00ccff;
-      text-shadow: 0 0 5px #00ccff;
-    }
-    .new-task {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
-    .new-task input,
-    .new-task textarea {
-      padding: 8px;
-      border: 1px solid #aaa;
-      border-radius: 4px;
-      background: #1a1a1a;
-      color: #fff;
-      flex: 1;
-    }
-    .new-task button {
-      padding: 8px 12px;
-      background: #00ccff;
-      color: #0d0d0d;
-      box-shadow: 0 0 10px rgba(0,204,255,0.5);
-      cursor: pointer;
-    }
-    .new-task button:hover {
-      background: #00aee0;
-      box-shadow: 0 0 15px rgba(0,204,255,0.7);
-    }
-    .task-item {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid #00ccff;
-      border-radius: 4px;
-      padding: 10px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 0 10px rgba(0,204,255,0.2);
-    }
-    .task-info-block {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .task-item .task-name {
-      font-size: 16px;
-      color: #e0e0e0;
-    }
-    .task-item .task-reward {
-      font-size: 14px;
-      color: #ccc;
-    }
-    .task-item .task-desc {
-      font-size: 14px;
-      color: #aaa;
-    }
-    .task-item .btn-group button {
-      margin-left: 5px;
-      padding: 5px 8px;
-      box-shadow: 0 0 10px rgba(0,204,255,0.2);
-      cursor: pointer;
-    }
-    .edit-btn {
-      background: #ffd600;
-      color: #000;
-    }
-    .delete-btn {
-      background: #ff2e63;
-      color: #fff;
-    }
-    .complete-btn {
-      background: #28a745;
-      color: #fff;
-    }
-    .edit-btn:hover {
-      background: #e6c300;
-      box-shadow: 0 0 15px rgba(255,214,0,0.6);
-    }
-    .delete-btn:hover {
-      background: #e60040;
-      box-shadow: 0 0 15px rgba(255,46,99,0.6);
-    }
-    .complete-btn:hover {
-      background: #218838;
-      box-shadow: 0 0 15px rgba(40,167,69,0.6);
-    }
-    /* Блок таймера */
-    .timer-section {
-      background: rgba(0, 0, 0, 0.4);
-      border: 2px solid #00ccff;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 15px rgba(0,204,255,0.3);
-      animation: neonFlicker 2s infinite alternate;
-    }
-    .timer-section h3 {
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #00ccff;
-      text-shadow: 0 0 5px #00ccff;
-    }
-    .timer-display {
-      font-size: 2.5em;
-      text-align: center;
-      margin-bottom: 10px;
-      color: #00ccff;
-      text-shadow: 0 0 8px #00ccff;
-    }
-    .timer-controls {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .timer-controls button {
-      padding: 8px 12px;
-      background: #00ccff;
-      color: #0d0d0d;
-      box-shadow: 0 0 10px rgba(0,204,255,0.5);
-      cursor: pointer;
-    }
-    .timer-controls button:hover {
-      background: #00aee0;
-      box-shadow: 0 0 15px rgba(0,204,255,0.7);
-    }
-    .timer-inputs {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-    .timer-inputs input {
-      width: 60px;
-      padding: 8px;
-      border: 1px solid #aaa;
-      border-radius: 4px;
-      background: #1a1a1a;
-      color: #fff;
-      text-align: center;
-    }
-    /* Модальные окна */
+    
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -372,59 +58,7 @@
       align-items: center;
       z-index: 1000;
     }
-    .modal {
-      background: rgba(0,0,0,0.85);
-      border: 2px solid #00ccff;
-      border-radius: 8px;
-      padding: 20px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 0 15px rgba(0,204,255,0.5);
-      color: #e0e0e0;
-    }
-    .modal h3 {
-      margin-bottom: 15px;
-      color: #00ccff;
-      text-shadow: 0 0 5px #00ccff;
-    }
-    .modal label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    .modal input,
-    .modal textarea {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #aaa;
-      border-radius: 4px;
-      margin-bottom: 10px;
-      background: #1a1a1a;
-      color: #fff;
-    }
-    .modal button {
-      padding: 8px 12px;
-      background: #00ccff;
-      color: #0d0d0d;
-      border-radius: 4px;
-      box-shadow: 0 0 10px rgba(0,204,255,0.5);
-      transition: box-shadow 0.2s;
-      cursor: pointer;
-    }
-    .modal button:hover {
-      background: #00aee0;
-      box-shadow: 0 0 15px rgba(0,204,255,0.7);
-    }
-    .modal .close-btn {
-      background: #ff2e63;
-      margin-left: 10px;
-      color: #fff;
-    }
-    .modal .close-btn:hover {
-      background: #e60040;
-      box-shadow: 0 0 15px rgba(255,46,99,0.6);
-    }
-    /* Уведомления */
+    
     .notification {
       position: fixed;
       bottom: 20px;
@@ -438,191 +72,336 @@
       display: none;
       z-index: 9999;
     }
-    /* Мобильная адаптация */
-    @media (max-width: 600px) {
-      .header { font-size: 20px; }
-      .skill-block h2 { font-size: 18px; }
-      .task-section h3, .timer-section h3 { font-size: 16px; }
-      .task-item .task-name { font-size: 14px; }
-      .nav-btn {
-        font-size: 20px;
-        padding: 8px;
-        min-width: 35px;
-        min-height: 35px;
-      }
-      .timer-display { font-size: 2em; }
-      .timer-inputs input { width: 50px; }
+    
+    .exp-square {
+      transition: all 0.2s ease;
+    }
+    
+    .exp-square.filled {
+      background: #00ccff;
+    }
+    
+    .exp-square.active {
+      transform: scale(1.2);
+      border-color: #ffff00;
+    }
+    
+    .sidebar {
+      animation: slideInFromLeft 0.5s ease-out;
+    }
+    
+    .sidebar-menu-item {
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar-menu-item:hover {
+      background: rgba(0, 204, 255, 0.1);
+      box-shadow: 0 0 15px rgba(0,204,255,0.2);
+    }
+    
+    .task-item.completed .task-name {
+      text-decoration: line-through;
+      color: #888;
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-  <!-- Canvas для звездного поля -->
+<body class="text-gray-200 min-h-screen relative pl-[240px]">
+  <!-- Stars Background -->
   <canvas id="starsCanvas"></canvas>
   
-  <!-- Кнопка регистрации (при клике переход на login.html) -->
-  <a href="login.html" class="reg-btn" id="regBtn">Регистрация</a>
-
-  <!-- Заголовок -->
-  <div class="header">Поднятие уровня в одиночку</div>
-  
-  <!-- Изображение сайта -->
-  <img src="202654381.png" alt="Изображение сайта" class="site-image" />
-  
-  <!-- Кнопки для работы с JSON -->
-  <button class="export-btn" onclick="copyDataAsJSON()">Копировать JSON</button>
-  <button class="download-btn" id="downloadJsonBtn">Скачать JSON</button>
-  <button class="upload-btn" id="uploadJsonBtn">Загрузить JSON</button>
-  <!-- Скрытый input для загрузки файла -->
-  <input type="file" id="jsonFileInput" accept="application/json" style="display:none" />
-  
-  <!-- Кнопка «Прокачка» -->
-  <button class="upgrade-btn" onclick="location.href='page2.html'">Прокачка</button>
-  
-  <!-- Блок навыков -->
-  <div class="skill-container">
-    <button class="nav-btn" onclick="prevSkill()">&lt;</button>
-    <div class="skill-block" id="skillBlock" onclick="openSkillModal()">
-      <h2 id="skillNameDisplay">Название навыка</h2>
-      <div class="skill-info">
-        <div class="skill-level">Уровень: <span id="skillLevelDisplay">1</span></div>
-        <div class="skill-exp" id="skillExpDisplay">
-          <div class="exp-square" data-index="0" onclick="skillSquareClick(event, 0)"></div>
-          <div class="exp-square" data-index="1" onclick="skillSquareClick(event, 1)"></div>
-          <div class="exp-square" data-index="2" onclick="skillSquareClick(event, 2)"></div>
-          <div class="exp-square" data-index="3" onclick="skillSquareClick(event, 3)"></div>
-          <div class="exp-square" data-index="4" onclick="skillSquareClick(event, 4)"></div>
+  <!-- Enhanced Sidebar -->
+  <div class="sidebar fixed top-0 left-0 w-60 h-full bg-black bg-opacity-70 backdrop-blur-md border-r border-cyan-500 border-opacity-30 shadow-lg z-50 flex flex-col overflow-hidden">
+    <!-- Sidebar Header -->
+    <div class="p-4 border-b border-cyan-500 border-opacity-20">
+      <div class="flex items-center justify-start space-x-3">
+        <div class="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center">
+          <i class="fas fa-user-shield text-black"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-cyan-400">Поднятие уровня</h2>
+          <p class="text-xs text-gray-400" id="userInfo">Гость</p>
         </div>
       </div>
     </div>
-    <button class="nav-btn" onclick="nextSkill()">&gt;</button>
+    
+    <!-- Sidebar Navigation -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar py-2">
+      <!-- Main Navigation -->
+      <div class="px-4 py-2">
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Навигация</h3>
+        <a href="#" class="sidebar-menu-item flex items-center space-x-3 px-3 py-2 rounded-lg text-cyan-400 hover:text-white mb-1">
+          <i class="fas fa-home w-5 text-center"></i>
+          <span>Главная</span>
+        </a>
+        <button onclick="location.href='page2.html'" class="sidebar-menu-item flex items-center space-x-3 px-3 py-2 rounded-lg text-cyan-400 hover:text-white w-full mb-1">
+          <i class="fas fa-level-up-alt w-5 text-center"></i>
+          <span>Прокачка</span>
+        </button>
+        <a href="#" class="sidebar-menu-item flex items-center space-x-3 px-3 py-2 rounded-lg text-cyan-400 hover:text-white mb-1">
+          <i class="fas fa-trophy w-5 text-center"></i>
+          <span>Достижения</span>
+        </a>
+        <a href="#" class="sidebar-menu-item flex items-center space-x-3 px-3 py-2 rounded-lg text-cyan-400 hover:text-white mb-1">
+          <i class="fas fa-chart-line w-5 text-center"></i>
+          <span>Статистика</span>
+        </a>
+      </div>
+      
+      <!-- Skills Section -->
+      <div class="px-4 py-2 border-t border-gray-800 border-opacity-50">
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Навыки</h3>
+        <button onclick="addNewSkill()" class="sidebar-menu-item flex items-center space-x-3 px-3 py-2 rounded-lg text-cyan-400 hover:text-white w-full mb-1">
+          <i class="fas fa-plus-circle w-5 text-center"></i>
+          <span>Добавить навык</span>
+        </button>
+        <button onclick="openSkillsManager()" class="sidebar-menu-item flex items-center space-x-3 px-3 py-2 rounded-lg text-cyan-400 hover:text-white w-full mb-1">
+          <i class="fas fa-list w-5 text-center"></i>
+          <span>Мои навыки</span>
+        </button>
+      </div>
+      
+      <!-- Data Management Section -->
+      <div class="px-4 py-2 border-t border-gray-800 border-opacity-50">
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Данные</h3>
+        <button onclick="copyDataAsJSON()" class="sidebar-menu-item flex items-center space-x-3 px-3 py-2 rounded-lg text-cyan-400 hover:text-white w-full mb-1">
+          <i class="fas fa-copy w-5 text-center"></i>
+          <span>Копировать данные</span>
+        </button>
+        <button id="downloadJsonBtn" class="sidebar-menu-item flex items-center space-x-3 px-3 py-2 rounded-lg text-cyan-400 hover:text-white w-full mb-1">
+          <i class="fas fa-download w-5 text-center"></i>
+          <span>Скачать данные</span>
+        </button>
+        <button id="uploadJsonBtn" class="sidebar-menu-item flex items-center space-x-3 px-3 py-2 rounded-lg text-cyan-400 hover:text-white w-full mb-1">
+          <i class="fas fa-upload w-5 text-center"></i>
+          <span>Загрузить данные</span>
+        </button>
+        <input type="file" id="jsonFileInput" class="hidden" accept="application/json" />
+      </div>
+    </div>
+    
+    <!-- Sidebar Footer -->
+    <div class="p-3 border-t border-gray-800 border-opacity-50 bg-black bg-opacity-20">
+      <a href="login.html" id="regBtn" class="w-full flex items-center justify-center space-x-2 bg-cyan-500 hover:bg-cyan-600 text-black font-medium py-2 px-3 rounded-lg transition-all duration-300 shadow-lg shadow-cyan-500/20">
+        <i class="fas fa-sign-in-alt"></i>
+        <span>Войти / Регистрация</span>
+      </a>
+      <div class="mt-3 text-center text-xs text-gray-500">
+        Версия 1.0.0
+      </div>
+    </div>
   </div>
   
-  <!-- Блок заданий -->
-  <div class="task-section">
-    <h3>Задания</h3>
-    <div class="new-task">
-      <input type="text" id="newTaskInput" placeholder="Название задания" />
-      <input type="text" id="newTaskRewardInput" placeholder="Награда (XP)" />
-      <textarea id="newTaskDescInput" placeholder="Описание задания"></textarea>
-      <button onclick="addTask()">Добавить задание</button>
+  <!-- Mobile Sidebar Toggle -->
+  <button id="sidebarToggle" class="md:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-full bg-cyan-500 text-black flex items-center justify-center shadow-lg">
+    <i class="fas fa-bars"></i>
+  </button>
+  
+  <!-- Main Content -->
+  <div class="main-content p-6">
+    <!-- Header -->
+    <h1 class="text-3xl md:text-4xl font-bold text-center text-cyan-400 mb-8">Поднятие уровня в одиночку</h1>
+    
+    <!-- Hero Image -->
+    <div class="flex justify-center mb-8">
+      <img src="202654381.png" alt="Изображение сайта" class="rounded-lg border border-cyan-500 shadow-lg shadow-cyan-500/30 max-h-48 md:max-h-64" id="heroImage">
     </div>
-    <div id="taskList"></div>
+    
+    <!-- Upgrade Button -->
+    <div class="flex justify-end mb-8">
+      <button onclick="location.href='page2.html'" class="bg-cyan-500 hover:bg-cyan-600 text-black font-medium py-2 px-4 rounded-lg transition-all duration-300 shadow-lg shadow-cyan-500/30">
+        <i class="fas fa-level-up-alt mr-2"></i> Перейти к прокачке
+      </button>
+    </div>
+    
+    <!-- Current Skill Section -->
+    <div class="bg-black bg-opacity-50 border border-cyan-500 rounded-xl p-6 mb-8 shadow-lg shadow-cyan-500/20 backdrop-blur-sm">
+      <h2 class="text-xl font-semibold text-cyan-400 mb-4">Текущий навык</h2>
+      
+      <div class="flex items-center justify-between">
+        <button class="text-2xl bg-cyan-500 hover:bg-cyan-600 text-black rounded-full w-10 h-10 flex items-center justify-center transition-all" onclick="prevSkill()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        <div class="skill-block bg-gradient-to-br from-gray-900 to-black border border-cyan-500 rounded-lg p-5 mx-4 flex-1 cursor-pointer transform hover:scale-[1.01] transition-all hover:shadow-lg hover:shadow-cyan-500/20" 
+             id="skillBlock" onclick="openSkillModal()">
+          <h2 class="text-xl font-bold text-cyan-400 mb-2" id="skillNameDisplay">Название навыка</h2>
+          <div class="skill-info">
+            <div class="text-gray-300 mb-3">
+              Уровень: <span class="font-bold text-white" id="skillLevelDisplay">1</span>
+            </div>
+            <div class="skill-exp flex gap-2" id="skillExpDisplay">
+              <div class="exp-square w-6 h-6 border border-cyan-500 rounded bg-gray-800" data-index="0"></div>
+              <div class="exp-square w-6 h-6 border border-cyan-500 rounded bg-gray-800" data-index="1"></div>
+              <div class="exp-square w-6 h-6 border border-cyan-500 rounded bg-gray-800" data-index="2"></div>
+              <div class="exp-square w-6 h-6 border border-cyan-500 rounded bg-gray-800" data-index="3"></div>
+              <div class="exp-square w-6 h-6 border border-cyan-500 rounded bg-gray-800" data-index="4"></div>
+            </div>
+          </div>
+        </div>
+        
+        <button class="text-2xl bg-cyan-500 hover:bg-cyan-600 text-black rounded-full w-10 h-10 flex items-center justify-center transition-all" onclick="nextSkill()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      
+      <div class="mt-6 flex justify-center">
+        <button onclick="addNewSkill()" class="bg-cyan-500 hover:bg-cyan-600 text-black font-medium py-2 px-4 rounded-lg transition-all duration-300">
+          <i class="fas fa-plus-circle mr-2"></i> Добавить новый навык
+        </button>
+      </div>
+    </div>
+    
+    <!-- Tasks Section -->
+    <div class="bg-black bg-opacity-50 border border-cyan-500 rounded-xl p-6 mb-8 shadow-lg shadow-cyan-500/20 backdrop-blur-sm" id="allTaskSection">
+      <h2 class="text-xl font-semibold text-cyan-400 mb-4">Все задания</h2>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4" id="newTaskForm">
+        <input type="text" id="newTaskInput" placeholder="Название задания" class="bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        <input type="text" id="newTaskRewardInput" placeholder="Награда (XP)" class="bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        <textarea id="newTaskDescInput" placeholder="Описание задания" class="bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 lg:col-span-2"></textarea>
+        <select id="newTaskTypeSelect" class="bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-200">
+          <option value="daily">Ежедневное</option>
+          <option value="day">Задание дня</option>
+        </select>
+        <select id="newTaskXpSkillSelect" class="bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-200"></select>
+        <button onclick="addTask()" class="bg-cyan-500 hover:bg-cyan-600 text-black font-medium py-2 px-4 rounded-lg transition-all duration-300 lg:col-span-2">
+          <i class="fas fa-plus mr-2"></i> Добавить задание
+        </button>
+      </div>
+      
+      <div id="taskList" class="space-y-3"></div>
+    </div>
+    
+    <!-- Timer Section -->
+    <div class="bg-black bg-opacity-50 border border-cyan-500 rounded-xl p-6 shadow-lg shadow-cyan-500/20 backdrop-blur-sm">
+      <h2 class="text-xl font-semibold text-cyan-400 mb-4">Таймер</h2>
+      
+      <div class="text-center mb-4">
+        <div class="text-5xl font-bold text-cyan-400 tracking-wider font-mono" id="timerDisplay">00:00:00</div>
+      </div>
+      
+      <div class="flex justify-center gap-3 mb-4">
+        <button id="startTimerBtn" onclick="startTimer()" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
+          <i class="fas fa-play mr-2"></i> Старт
+        </button>
+        <button id="pauseTimerBtn" onclick="pauseTimer()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
+          <i class="fas fa-pause mr-2"></i> Пауза
+        </button>
+        <button id="resetTimerBtn" onclick="resetTimer()" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
+          <i class="fas fa-stop mr-2"></i> Сброс
+        </button>
+      </div>
+      
+      <div class="flex justify-center gap-3">
+        <input type="number" id="hoursInput" placeholder="Часы" min="0" value="0" class="bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg px-4 py-2 w-20 text-center focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        <input type="number" id="minutesInput" placeholder="Минуты" min="0" value="0" class="bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg px-4 py-2 w-20 text-center focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        <input type="number" id="secondsInput" placeholder="Секунды" min="0" value="0" class="bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg px-4 py-2 w-20 text-center focus:outline-none focus:ring-2 focus:ring-cyan-500">
+      </div>
+    </div>
   </div>
   
-  <!-- Блок таймера -->
-  <div class="timer-section">
-    <h3>Таймер</h3>
-    <div class="timer-display" id="timerDisplay">00:00:00</div>
-    <div class="timer-controls">
-      <button id="startTimerBtn" onclick="startTimer()">Старт</button>
-      <button id="pauseTimerBtn" onclick="pauseTimer()">Пауза</button>
-      <button id="resetTimerBtn" onclick="resetTimer()">Сброс</button>
-    </div>
-    <div class="timer-inputs">
-      <input type="number" id="hoursInput" placeholder="Часы" min="0" value="0" />
-      <input type="number" id="minutesInput" placeholder="Минуты" min="0" value="0" />
-      <input type="number" id="secondsInput" placeholder="Секунды" min="0" value="0" />
-    </div>
-  </div>
-  
-  <!-- Модальное окно для редактирования навыка -->
+  <!-- Modals -->
   <div class="modal-overlay" id="skillModalOverlay">
-    <div class="modal">
-      <h3>Редактировать навык</h3>
-      <label for="skillNameInput">Название навыка</label>
-      <input type="text" id="skillNameInput" placeholder="Введите название навыка" />
-      <label for="skillLevelInput">Уровень</label>
-      <input type="number" id="skillLevelInput" min="1" value="1" />
-      <label for="skillExpInput">Опыт (0–5)</label>
-      <input type="number" id="skillExpInput" min="0" max="5" value="0" />
-      <label for="skillDescInput">Описание навыка</label>
-      <textarea id="skillDescInput" placeholder="Введите описание навыка"></textarea>
-      <button onclick="saveSkillModal()">Сохранить</button>
-      <button class="close-btn" onclick="closeSkillModal()">Отмена</button>
+    <div class="bg-gray-900 border border-cyan-500 rounded-lg p-6 w-full max-w-md mx-4">
+      <h3 class="text-xl font-bold text-cyan-400 mb-4">Редактировать навык</h3>
+      
+      <div class="space-y-4 mb-4">
+        <div>
+          <label for="skillNameInput" class="block text-sm font-medium text-gray-300 mb-1">Название навыка</label>
+          <input type="text" id="skillNameInput" placeholder="Введите название навыка" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        </div>
+        
+        <div>
+          <label for="skillLevelInput" class="block text-sm font-medium text-gray-300 mb-1">Уровень (≥1)</label>
+          <input type="number" id="skillLevelInput" min="1" value="1" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        </div>
+        
+        <div>
+          <label for="skillExpInput" class="block text-sm font-medium text-gray-300 mb-1">Опыт (0-5)</label>
+          <input type="number" id="skillExpInput" min="0" max="5" value="0" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        </div>
+        
+        <div>
+          <label for="skillDescInput" class="block text-sm font-medium text-gray-300 mb-1">Описание навыка</label>
+          <textarea id="skillDescInput" placeholder="Введите описание навыка" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
+        </div>
+      </div>
+      
+      <div class="flex justify-end gap-2">
+        <button class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300" onclick="closeSkillModal()">
+          Отмена
+        </button>
+        <button class="bg-cyan-500 hover:bg-cyan-600 text-black font-medium py-2 px-4 rounded-lg transition-all duration-300" onclick="saveSkillModal()">
+          Сохранить
+        </button>
+      </div>
     </div>
   </div>
   
-  <!-- Модальное окно для редактирования задания -->
   <div class="modal-overlay" id="taskModalOverlay">
-    <div class="modal">
-      <h3>Редактировать задание</h3>
-      <label for="taskNameInput">Название задания</label>
-      <input type="text" id="taskNameInput" placeholder="Введите название задания" />
-      <label for="taskRewardInput">Награда (XP)</label>
-      <input type="text" id="taskRewardInput" placeholder="Введите награду" />
-      <label for="taskDescInput">Описание задания</label>
-      <textarea id="taskDescInput" placeholder="Введите описание задания"></textarea>
-      <button onclick="saveTaskModal()">Сохранить</button>
-      <button class="close-btn" onclick="closeTaskModal()">Отмена</button>
+    <div class="bg-gray-900 border border-cyan-500 rounded-lg p-6 w-full max-w-md mx-4">
+      <h3 class="text-xl font-bold text-cyan-400 mb-4">Редактировать задание</h3>
+      
+      <div class="space-y-4 mb-4">
+        <div>
+          <label for="taskNameInput" class="block text-sm font-medium text-gray-300 mb-1">Название задания</label>
+          <input type="text" id="taskNameInput" placeholder="Введите название задания" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        </div>
+        
+        <div>
+          <label for="taskRewardInput" class="block text-sm font-medium text-gray-300 mb-1">Награда (XP)</label>
+          <input type="text" id="taskRewardInput" placeholder="Введите награду" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        </div>
+        
+        <div>
+          <label for="taskDescInput" class="block text-sm font-medium text-gray-300 mb-1">Описание задания</label>
+          <textarea id="taskDescInput" placeholder="Введите описание задания" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
+        </div>
+        
+        <div>
+          <label for="taskTypeSelect" class="block text-sm font-medium text-gray-300 mb-1">Тип задания</label>
+          <select id="taskTypeSelect" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-200">
+            <option value="daily">Ежедневное</option>
+            <option value="day">Задание дня</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="taskXpSkillSelect" class="block text-sm font-medium text-gray-300 mb-1">Навык для опыта</label>
+          <select id="taskXpSkillSelect" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-200"></select>
+        </div>
+      </div>
+      
+      <div class="flex justify-end gap-2">
+        <button class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300" onclick="closeTaskModal()">
+          Отмена
+        </button>
+        <button class="bg-cyan-500 hover:bg-cyan-600 text-black font-medium py-2 px-4 rounded-lg transition-all duration-300" onclick="saveTaskModal()">
+          Сохранить
+        </button>
+      </div>
     </div>
   </div>
   
-  <!-- Скрипты -->
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+  
+  <!-- JavaScript -->
   <script>
-    // При загрузке страницы проверяем авторизацию
-    window.addEventListener('load', () => {
-      const userData = JSON.parse(localStorage.getItem('userData'));
-      if(userData) {
-        // Если пользователь авторизован, меняем текст кнопки на логин пользователя
-        document.getElementById('regBtn').textContent = userData.username;
-      }
-    });
-    
-    /* =================== Звездное поле (canvas) =================== */
-    const canvas = document.getElementById("starsCanvas");
-    const ctx = canvas.getContext("2d");
-    
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-    
-    // Анимация звездного поля
-    const stars = [];
-    const numStars = 300;
-    for (let i = 0; i < numStars; i++) {
-      stars.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        radius: Math.random() * 1.5,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3
-      });
-    }
-    
-    function animateStarfield() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let star of stars) {
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "#ffffff";
-        ctx.fill();
-        star.x += star.vx;
-        star.y += star.vy;
-        if (star.x < 0) star.x = canvas.width;
-        if (star.x > canvas.width) star.x = 0;
-        if (star.y < 0) star.y = canvas.height;
-        if (star.y > canvas.height) star.y = 0;
-      }
-      requestAnimationFrame(animateStarfield);
-    }
-    animateStarfield();
-    
-    /* =================== Работа с данными и localStorage =================== */
+    // Data Handling
     const STORAGE_KEY = "levelUpData";
     let data = {
       skills: [],
       tasks: []
     };
-    
-    // Функция для обеспечения наличия дефолтного навыка
+
     function ensureDefaultSkill() {
       const defaultExists = data.skills.some(skill => skill.default);
       if (!defaultExists) {
         data.skills.push({
-          id: generateId(),
+          id: crypto.randomUUID ? crypto.randomUUID() : ('_' + Math.random().toString(36).substr(2, 9)),
           name: "Default Skill",
           level: 1,
           exp: 0,
@@ -631,15 +410,14 @@
         });
       }
     }
-    
+
     if (localStorage.getItem(STORAGE_KEY)) {
       data = JSON.parse(localStorage.getItem(STORAGE_KEY));
       ensureDefaultSkill();
       saveData();
     } else {
-      // Создаем дефолтный навык с пометкой default
       data.skills.push({
-        id: generateId(),
+        id: crypto.randomUUID ? crypto.randomUUID() : ('_' + Math.random().toString(36).substr(2, 9)),
         name: "Default Skill",
         level: 1,
         exp: 0,
@@ -648,26 +426,26 @@
       });
       saveData();
     }
-    
+
     let currentSkillIndex = 0;
     let currentTaskId = null;
-    
+
     function saveData() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
+
     function generateId() {
-      return '_' + Math.random().toString(36).substr(2, 9);
+      return crypto.randomUUID ? crypto.randomUUID() : ('_' + Math.random().toString(36).substr(2, 9));
     }
-    
-    // Функция копирования JSON в буфер обмена
+
+    // JSON Operations
     function copyDataAsJSON() {
       const jsonStr = JSON.stringify(data, null, 2);
       navigator.clipboard.writeText(jsonStr)
         .then(() => showNotification("JSON скопирован в буфер обмена!"))
         .catch((err) => console.error("Ошибка копирования JSON:", err));
     }
-    
-    // Функция скачивания данных в JSON-файл
+
     function downloadDataAsJSON() {
       const jsonStr = JSON.stringify(data, null, 2);
       const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -681,8 +459,7 @@
       URL.revokeObjectURL(url);
       showNotification("Данные скачаны в файл levelUpData.json!");
     }
-    
-    // Функция загрузки данных из выбранного JSON-файла
+
     function uploadDataFromJSON(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -690,29 +467,22 @@
       reader.onload = (e) => {
         try {
           const uploadedData = JSON.parse(e.target.result);
-          // При загрузке данных проверяем наличие дефолтного навыка
           data = uploadedData;
           ensureDefaultSkill();
           saveData();
           renderSkill();
           renderTasks();
+          updateXpSkillSelect();
           showNotification("Данные загружены!");
         } catch (error) {
           console.error("Ошибка парсинга JSON:", error);
-          alert("Ошибка при загрузке файла JSON!");
+          showNotification("Ошибка при загрузке файла JSON!");
         }
       };
       reader.readAsText(file);
     }
-    
-    // Обработчики кнопок скачивания и загрузки
-    document.getElementById("downloadJsonBtn").addEventListener("click", downloadDataAsJSON);
-    document.getElementById("uploadJsonBtn").addEventListener("click", () => {
-      document.getElementById("jsonFileInput").click();
-    });
-    document.getElementById("jsonFileInput").addEventListener("change", uploadDataFromJSON);
-    
-    /* =================== Рендер и редактирование навыков =================== */
+
+    // Skill Management
     function renderSkill() {
       if (data.skills.length === 0) {
         data.skills.push({
@@ -726,44 +496,55 @@
         currentSkillIndex = 0;
         saveData();
       }
+      
       const skill = data.skills[currentSkillIndex];
       document.getElementById("skillNameDisplay").innerText = skill.name;
       document.getElementById("skillLevelDisplay").innerText = skill.level;
+      
       const squares = document.querySelectorAll("#skillExpDisplay .exp-square");
       squares.forEach((sq, index) => {
-        if (index < skill.exp) {
-          sq.classList.add("filled");
-        } else {
-          sq.classList.remove("filled");
-        }
+        sq.classList.toggle("filled", index < skill.exp);
+        sq.onclick = (e) => skillSquareClick(e, index);
+        
+        // Add hover sound effect
+        sq.onmouseenter = () => {
+          const sound = document.getElementById("guiSound");
+          if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log("Автовоспроизведение звука заблокировано"));
+          }
+        };
       });
+      
       const skillBlock = document.getElementById("skillBlock");
-      if (skill.default) {
-        skillBlock.classList.add("default-skill");
-      } else {
-        skillBlock.classList.remove("default-skill");
-      }
+      skillBlock.classList.toggle("bg-red-500", skill.default);
+      skillBlock.classList.toggle("bg-opacity-10", skill.default);
     }
-    
+
     function skillSquareClick(e, index) {
       e.stopPropagation();
       const skill = data.skills[currentSkillIndex];
-      if (skill.exp > index) {
-        skill.exp = index;
-      } else {
-        skill.exp = index + 1;
-      }
+      
+      const target = e.currentTarget;
+      target.classList.add("transform", "scale-125");
+      setTimeout(() => { 
+        target.classList.remove("transform", "scale-125"); 
+      }, 300);
+      
+      skill.exp = (skill.exp > index) ? index : (index + 1);
+      
       saveData();
       renderSkill();
+      checkLevelUp(skill);
     }
-    
+
     function prevSkill() {
       if (currentSkillIndex > 0) {
         currentSkillIndex--;
         renderSkill();
       }
     }
-    
+
     function nextSkill() {
       if (currentSkillIndex < data.skills.length - 1) {
         currentSkillIndex++;
@@ -772,7 +553,7 @@
       }
       renderSkill();
     }
-    
+
     function addNewSkill() {
       const newSkill = {
         id: generateId(),
@@ -782,195 +563,310 @@
         desc: "",
         default: false
       };
+      
       data.skills.push(newSkill);
       currentSkillIndex = data.skills.length - 1;
       saveData();
+      updateXpSkillSelect();
+      renderSkill();
+      showNotification("Навык добавлен!");
     }
-    
+
+    function openSkillsManager() {
+      showNotification("Менеджер навыков скоро будет доступен!");
+    }
+
     function openSkillModal() {
       const skill = data.skills[currentSkillIndex];
       if (skill.default) {
-        location.href = 'page2.html';
+        showNotification("Невозможно редактировать дефолтный навык.");
         return;
       }
+      
       document.getElementById("skillModalOverlay").style.display = "flex";
       document.getElementById("skillNameInput").value = skill.name;
       document.getElementById("skillLevelInput").value = skill.level;
       document.getElementById("skillExpInput").value = skill.exp;
       document.getElementById("skillDescInput").value = skill.desc;
     }
-    
+
     function closeSkillModal() {
       document.getElementById("skillModalOverlay").style.display = "none";
     }
-    
+
     function saveSkillModal() {
+      const name = document.getElementById("skillNameInput").value.trim();
+      const level = parseInt(document.getElementById("skillLevelInput").value);
+      const exp = parseInt(document.getElementById("skillExpInput").value);
+      const desc = document.getElementById("skillDescInput").value;
+      
+      if (!name || isNaN(level) || level < 1 || isNaN(exp) || exp < 0 || exp > 5) {
+        showNotification("Ошибка: Проверьте корректность данных навыка (уровень ≥ 1, опыт 0–5).");
+        return;
+      }
+      
       const skill = data.skills[currentSkillIndex];
-      skill.name = document.getElementById("skillNameInput").value || "Название навыка";
-      skill.level = parseInt(document.getElementById("skillLevelInput").value) || 1;
-      skill.exp = parseInt(document.getElementById("skillExpInput").value) || 0;
-      skill.desc = document.getElementById("skillDescInput").value;
+      skill.name = name;
+      skill.level = level;
+      skill.exp = exp;
+      skill.desc = desc;
       skill.default = false;
+      
       saveData();
       closeSkillModal();
       renderSkill();
+      updateXpSkillSelect();
       showNotification("Навык сохранён!");
     }
-    
-    function checkLevelUp() {
-      const skill = data.skills[currentSkillIndex];
+
+    function checkLevelUp(skill) {
       if (skill.exp >= 5) {
         skill.exp -= 5;
         skill.level++;
         showNotification(`Уровень повышен до ${skill.level}!`);
+        saveData();
+        renderSkill();
       }
     }
-    
-    /* =================== Рендер и редактирование заданий =================== */
+
+    // Task Management
     function renderTasks() {
-      const taskList = document.getElementById("taskList");
-      taskList.innerHTML = "";
+      const container = document.getElementById("taskList");
+      container.innerHTML = "";
+      
       data.tasks.forEach(task => {
         const div = document.createElement("div");
-        div.className = "task-item";
+        div.className = `flex justify-between items-center p-4 rounded-lg bg-gray-900 bg-opacity-60 border ${task.completed ? 'border-gray-700' : 'border-cyan-500'} transition-all`;
         div.dataset.id = task.id;
     
         const infoBlock = document.createElement("div");
-        infoBlock.className = "task-info-block";
+        infoBlock.className = "space-y-1";
     
-        const nameSpan = document.createElement("span");
-        nameSpan.className = "task-name";
+        const nameSpan = document.createElement("h3");
+        nameSpan.className = `font-medium ${task.completed ? 'text-gray-500 line-through' : 'text-white'}`;
         nameSpan.innerText = task.name;
     
-        const rewardSpan = document.createElement("span");
-        rewardSpan.className = "task-reward";
-        rewardSpan.innerText = task.reward ? `Награда: ${task.reward} XP` : "Награда: —";
+        const rewardSpan = document.createElement("p");
+        rewardSpan.className = "text-sm text-gray-400";
+        const rewardNum = Number(task.reward);
+        rewardSpan.innerText = (!isNaN(rewardNum) && rewardNum >= 0) ? `Награда: ${rewardNum} XP` : "Награда: —";
     
-        const descSpan = document.createElement("span");
-        descSpan.className = "task-desc";
-        descSpan.innerText = task.desc ? `Описание: ${task.desc}` : "Описание: —";
-    
+        const typeSpan = document.createElement("p");
+        typeSpan.className = "text-xs text-gray-500";
+        typeSpan.innerText = `Тип: ${task.type === "daily" ? "Ежедневное" : "Задание дня"}`;
+        
+        const progressBar = document.createElement("div");
+        progressBar.className = "w-full bg-gray-700 h-1 rounded mt-2 overflow-hidden";
+        if (!task.completed && task.duration) {
+          const progressFill = document.createElement("div");
+          progressFill.className = "bg-cyan-500 h-full";
+          progressFill.style.width = "50%"; // Placeholder for actual progress
+          progressBar.appendChild(progressFill);
+        }
+        
         infoBlock.appendChild(nameSpan);
         infoBlock.appendChild(rewardSpan);
-        infoBlock.appendChild(descSpan);
+        infoBlock.appendChild(typeSpan);
+        infoBlock.appendChild(progressBar);
+        
         div.appendChild(infoBlock);
     
         const btnGroup = document.createElement("div");
-        btnGroup.className = "btn-group";
+        btnGroup.className = "flex space-x-2";
     
         const completeBtn = document.createElement("button");
-        completeBtn.className = "complete-btn";
-        completeBtn.innerText = "выполнено";
+        completeBtn.className = `px-3 py-1 rounded text-sm ${task.completed ? 'bg-gray-600 text-gray-300' : 'bg-green-600 text-white'}`;
+        completeBtn.innerText = task.completed ? "Выполнено" : "Выполнить";
         completeBtn.onclick = () => completeTask(task.id);
     
         const editBtn = document.createElement("button");
-        editBtn.className = "edit-btn";
-        editBtn.innerText = "ред.";
+        editBtn.className = "px-3 py-1 rounded text-sm bg-yellow-600 text-white";
+        editBtn.innerText = "Ред.";
         editBtn.onclick = () => openTaskModal(task.id);
     
         const deleteBtn = document.createElement("button");
-        deleteBtn.className = "delete-btn";
-        deleteBtn.innerText = "удалить";
+        deleteBtn.className = "px-3 py-1 rounded text-sm bg-red-600 text-white";
+        deleteBtn.innerText = "Удалить";
         deleteBtn.onclick = () => {
-          data.tasks = data.tasks.filter(t => t.id !== task.id);
-          saveData();
-          renderTasks();
-          showNotification("Задание удалено!");
+          if(confirm("Удалить задание?")) {
+            data.tasks = data.tasks.filter(t => t.id !== task.id);
+            saveData();
+            renderTasks();
+            showNotification("Задание удалено!");
+          }
         };
-    
+        
         btnGroup.appendChild(completeBtn);
         btnGroup.appendChild(editBtn);
         btnGroup.appendChild(deleteBtn);
         div.appendChild(btnGroup);
     
-        taskList.appendChild(div);
+        container.appendChild(div);
       });
     }
-    
+
     function addTask() {
       const name = document.getElementById("newTaskInput").value.trim();
-      const reward = document.getElementById("newTaskRewardInput").value.trim();
+      const rewardStr = document.getElementById("newTaskRewardInput").value.trim();
       const desc = document.getElementById("newTaskDescInput").value.trim();
-      if (!name) return;
+      const type = document.getElementById("newTaskTypeSelect").value;
+      const xpSkill = document.getElementById("newTaskXpSkillSelect").value;
+      
+      if (!name) {
+        showNotification("Ошибка: Введите название задания.");
+        return;
+      }
+      
+      let reward = 0;
+      if(rewardStr !== "") {
+        reward = Number(rewardStr);
+        if(isNaN(reward) || reward < 0) {
+          highlightField("newTaskRewardInput");
+          showNotification("Ошибка: Награда должна быть неотрицательным числом.");
+          return;
+        }
+      }
+      
       const task = {
         id: generateId(),
         name,
         reward,
-        desc
+        desc,
+        type,
+        xpSkill,
+        completed: false,
+        createdAt: new Date().toISOString()
       };
+      
       data.tasks.push(task);
       document.getElementById("newTaskInput").value = "";
       document.getElementById("newTaskRewardInput").value = "";
       document.getElementById("newTaskDescInput").value = "";
+      
       saveData();
       renderTasks();
       showNotification("Задание добавлено!");
     }
-    
+
     function completeTask(id) {
       const task = data.tasks.find(t => t.id === id);
-      if (task && task.reward) {
-        const xpReward = parseInt(task.reward) || 0;
-        const skill = data.skills[currentSkillIndex];
+      if (!task) return;
+      
+      if (task.completed) {
+        showNotification("Задание уже выполнено.");
+        return;
+      }
+      
+      if (task.reward !== "" && !isNaN(Number(task.reward)) && Number(task.reward) >= 0) {
+        const xpReward = Number(task.reward);
+        let skill = data.skills.find(s => s.id === task.xpSkill);
+        
+        if(!skill) {
+          skill = data.skills[0];
+          showNotification(`Навык задачи не найден, XP начислено на ${skill.name}`);
+        }
+        
         skill.exp += xpReward;
-        checkLevelUp();
+        checkLevelUp(skill);
         saveData();
         renderSkill();
       }
-      data.tasks = data.tasks.filter(t => t.id !== id);
+      
+      task.completed = true;
+      task.completedAt = new Date().toISOString();
       saveData();
       renderTasks();
       showNotification("Задание выполнено и опыт получен!");
     }
-    
+
     function openTaskModal(id) {
       currentTaskId = id;
       const task = data.tasks.find(t => t.id === id);
       if (task) {
         document.getElementById("taskNameInput").value = task.name;
-        document.getElementById("taskRewardInput").value = task.reward || "";
-        document.getElementById("taskDescInput").value = task.desc || "";
+        document.getElementById("taskRewardInput").value = task.reward;
+        document.getElementById("taskDescInput").value = task.desc;
+        document.getElementById("taskTypeSelect").value = task.type;
+        document.getElementById("taskXpSkillSelect").value = task.xpSkill;
         document.getElementById("taskModalOverlay").style.display = "flex";
       }
     }
-    
+
     function closeTaskModal() {
       document.getElementById("taskModalOverlay").style.display = "none";
       currentTaskId = null;
     }
-    
+
     function saveTaskModal() {
       const name = document.getElementById("taskNameInput").value.trim();
-      const reward = document.getElementById("taskRewardInput").value.trim();
+      const rewardStr = document.getElementById("taskRewardInput").value.trim();
       const desc = document.getElementById("taskDescInput").value.trim();
+      const type = document.getElementById("taskTypeSelect").value;
+      const xpSkill = document.getElementById("taskXpSkillSelect").value;
+      
+      if (!name) {
+        showNotification("Ошибка: Введите название задания.");
+        return;
+      }
+      
+      let reward = 0;
+      if(rewardStr !== "") {
+        reward = Number(rewardStr);
+        if(isNaN(reward) || reward < 0) {
+          highlightField("taskRewardInput");
+          showNotification("Ошибка: Награда должна быть неотрицательным числом.");
+          return;
+        }
+      }
+      
       if (currentTaskId) {
         const task = data.tasks.find(t => t.id === currentTaskId);
         if (task) {
-          task.name = name || "Без названия";
+          task.name = name;
           task.reward = reward;
           task.desc = desc;
+          task.type = type;
+          task.xpSkill = xpSkill;
         }
       }
+      
       saveData();
       closeTaskModal();
       renderTasks();
       showNotification("Задание обновлено!");
     }
-    
-    /* =================== Таймер =================== */
+
+    function highlightField(fieldId) {
+      const field = document.getElementById(fieldId);
+      field.classList.add("border-2", "border-red-500", "animate-pulse");
+      setTimeout(() => {
+        field.classList.remove("border-2", "border-red-500", "animate-pulse");
+      }, 1500);
+    }
+
+    // Timer Functions
     let timerInterval = null;
     let remainingTime = { hours: 0, minutes: 0, seconds: 0 };
     
     function startTimer() {
-      const hours = parseInt(document.getElementById("hoursInput").value) || 0;
-      const minutes = parseInt(document.getElementById("minutesInput").value) || 0;
-      const seconds = parseInt(document.getElementById("secondsInput").value) || 0;
-      if (hours === 0 && minutes === 0 && seconds === 0) {
-        alert("Укажите время для таймера!");
+      const hours = Number(document.getElementById("hoursInput").value) || 0;
+      const minutes = Number(document.getElementById("minutesInput").value) || 0;
+      const seconds = Number(document.getElementById("secondsInput").value) || 0;
+      
+      if (hours < 0 || minutes < 0 || seconds < 0) {
+        showNotification("Ошибка: Время не может быть отрицательным.");
         return;
       }
+      
+      if (hours === 0 && minutes === 0 && seconds === 0) {
+        showNotification("Укажите время для таймера!");
+        return;
+      }
+      
       remainingTime = { hours, minutes, seconds };
       updateTimerDisplay();
+      
+      if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(updateTimer, 1000);
     }
     
@@ -989,12 +885,13 @@
           } else {
             clearInterval(timerInterval);
             timerInterval = null;
-            alert("Время истекло!");
+            showNotification("Время истекло!");
             resetTimer();
             return;
           }
         }
       }
+      
       updateTimerDisplay();
     }
     
@@ -1024,23 +921,110 @@
       const s = String(time.seconds).padStart(2, '0');
       return `${h}:${m}:${s}`;
     }
-    
-    /* =================== Уведомления =================== */
+
+    // Utility Functions
+    function updateXpSkillSelect() {
+      const newTaskXpSelect = document.getElementById("newTaskXpSkillSelect");
+      const taskXpSelect = document.getElementById("taskXpSkillSelect");
+      
+      newTaskXpSelect.innerHTML = "";
+      taskXpSelect.innerHTML = "";
+      
+      data.skills.forEach(skill => {
+        const option = document.createElement("option");
+        option.value = skill.id;
+        option.innerText = skill.name;
+        newTaskXpSelect.appendChild(option);
+        
+        const option2 = option.cloneNode(true);
+        taskXpSelect.appendChild(option2);
+      });
+    }
+
     function showNotification(message) {
-      const notification = document.createElement("div");
-      notification.className = "notification";
+      const notification = document.getElementById("notification");
       notification.innerText = message;
-      document.body.appendChild(notification);
       notification.style.display = "block";
+      
       setTimeout(() => {
         notification.style.display = "none";
-        document.body.removeChild(notification);
       }, 3000);
     }
-    
-    /* =================== INITIAL RENDER =================== */
-    renderSkill();
-    renderTasks();
+
+    // Initialize on Load
+    document.addEventListener('DOMContentLoaded', () => {
+      const userData = JSON.parse(localStorage.getItem('userData'));
+      if(userData) {
+        document.getElementById('regBtn').textContent = "Мой профиль";
+        document.getElementById('userInfo').textContent = userData.username;
+      }
+      
+      // Setup event listeners
+      document.getElementById("downloadJsonBtn").addEventListener("click", downloadDataAsJSON);
+      document.getElementById("uploadJsonBtn").addEventListener("click", () => {
+        document.getElementById("jsonFileInput").click();
+      });
+      document.getElementById("jsonFileInput").addEventListener("change", uploadDataFromJSON);
+      document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+      
+      // Initial renders
+      updateXpSkillSelect();
+      renderSkill();
+      renderTasks();
+      animateStarfield();
+    });
+
+    // Mobile Sidebar Toggle
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('translate-x-[-240px]');
+    }
+
+    // Starfield Animation
+    function animateStarfield() {
+      const canvas = document.getElementById("starsCanvas");
+      const ctx = canvas.getContext("2d");
+      
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+      
+      const stars = [];
+      const numStars = 300;
+      
+      for (let i = 0; i < numStars; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3
+        });
+      }
+      
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let star of stars) {
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffffff";
+          ctx.fill();
+          star.x += star.vx;
+          star.y += star.vy;
+          if (star.x < 0) star.x = canvas.width;
+          if (star.x > canvas.width) star.x = 0;
+          if (star.y < 0) star.y = canvas.height;
+          if (star.y > canvas.height) star.y = 0;
+        }
+        requestAnimationFrame(draw);
+      }
+      
+      draw();
+    }
   </script>
 </body>
 </html>
